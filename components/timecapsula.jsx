@@ -635,10 +635,28 @@ export default function TimeCapsula() {
       showToast('Please fill in all required fields ✦');
       return;
     }
+    if (form.when === 'custom' && !form.customDate) {
+      showToast('Please pick a delivery date ✦');
+      return;
+    }
     setSubmitting(true);
-    await new Promise(r => setTimeout(r, 1800));
-    setSubmitting(false);
-    setView('success');
+    try {
+      const res = await fetch('/api/capsules', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || 'Something went wrong. Try again.');
+        return;
+      }
+      setView('success');
+    } catch (err) {
+      showToast('Network error. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const scrollToWrite = () => {
