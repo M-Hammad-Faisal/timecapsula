@@ -2,6 +2,7 @@ import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { createClient as createUserClient } from '../../../lib/supabase/server'
 
 const GUEST_LIMIT = 3
+const FREE_USER_LIMIT = 10
 
 function getServiceClient() {
   return createServiceClient(
@@ -21,7 +22,7 @@ function getIP(request) {
 export async function POST(request) {
   try {
     const body = await request.json()
-    const { to, toEmail, from, subject, message, when, customDate } = body
+    const { to, toEmail, from, subject, message, when, customDate, template } = body
 
     if (!to || !toEmail || !message || !when) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 })
@@ -45,8 +46,8 @@ export async function POST(request) {
     } = await userClient.auth.getUser()
     const supabase = getServiceClient()
 
-    // ── Rate limiting for guests ──────────────────────────────────
     if (!user) {
+      // ── Guest rate limit ───────────────────────────────────────
       const ip = getIP(request)
       const { count } = await supabase
         .from('capsules')
@@ -57,7 +58,23 @@ export async function POST(request) {
       if (count >= GUEST_LIMIT) {
         return Response.json(
           {
-            error: `Guests can send up to ${GUEST_LIMIT} capsules. Sign in to send unlimited.`,
+            error: `Guests can send up to ${GUEST_LIMIT} capsules. Sign in for up to ${FREE_USER_LIMIT}.`,
+            limitReached: true,
+          },
+          { status: 429 }
+        )
+      }
+    } else {
+      // ── Free user limit ────────────────────────────────────────
+      const { count } = await supabase
+        .from('capsules')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+
+      if (count >= FREE_USER_LIMIT) {
+        return Response.json(
+          {
+            error: `Free plan allows up to ${FREE_USER_LIMIT} capsules.`,
             limitReached: true,
           },
           { status: 429 }
@@ -76,6 +93,7 @@ export async function POST(request) {
         deliver_at: deliverAt.toISOString(),
         user_id: user?.id || null,
         ip_address: user ? null : getIP(request),
+        template: template || 'cosmic',
       })
       .select('id, deliver_at')
       .single()
@@ -103,14 +121,15 @@ export async function GET() {
     const supabase = getServiceClient()
     const { data, error } = await supabase
       .from('capsules')
-      .select('id, to_name, to_email, subject, deliver_at, delivered, created_at, share_enabled')
+      .select(
+        'id, to_name, to_email, subject, deliver_at, delivered, created_at, share_enabled, template'
+      )
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
     if (error) throw error
     return Response.json({ capsules: data })
   } catch (_err) {
-    console.error('Error fetching capsules:', _err)
     return Response.json({ error: 'Failed to fetch capsules' }, { status: 500 })
   }
 }

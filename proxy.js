@@ -23,10 +23,20 @@ export async function proxy(request) {
     }
   )
 
-  // Refresh session — important, do not remove
-  await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const { pathname } = request.nextUrl
 
-  // No redirect for /dashboard — the Dashboard component handles its own login UI
+  // Signed-in user hits homepage → send to dashboard
+  if (user && pathname === '/') {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  // /write is for signed-in users only → redirect to dashboard login
+  if (!user && pathname === '/write') {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
 
   return supabaseResponse
 }

@@ -8,6 +8,46 @@ function getServiceClient() {
   )
 }
 
+// ── GET /api/capsules/[id] ─────────────────────────────────────────
+// - Auth'd owner: returns full capsule including message
+// - Public: returns preview (no message) if share_enabled
+export async function GET(request, { params }) {
+  try {
+    const { id } = await params
+    const supabase = getServiceClient()
+
+    // Check if authenticated user is the owner → return full content
+    const userClient = await createUserClient()
+    const {
+      data: { user },
+    } = await userClient.auth.getUser()
+
+    if (user) {
+      const { data: owned } = await supabase
+        .from('capsules')
+        .select('*')
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .single()
+
+      if (owned) return Response.json({ capsule: owned })
+    }
+
+    // Public preview — no message content
+    const { data, error } = await supabase
+      .from('capsules')
+      .select('id, to_name, from_name, subject, deliver_at, delivered, share_enabled, created_at')
+      .eq('id', id)
+      .eq('share_enabled', true)
+      .single()
+
+    if (error || !data) return Response.json({ error: 'Capsule not found' }, { status: 404 })
+    return Response.json({ capsule: data })
+  } catch (_err) {
+    return Response.json({ error: 'Failed to fetch capsule' }, { status: 500 })
+  }
+}
+
 // ── DELETE /api/capsules/[id] ─────────────────────────────────────
 export async function DELETE(_request, { params }) {
   try {
@@ -19,8 +59,6 @@ export async function DELETE(_request, { params }) {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
     const supabase = getServiceClient()
-
-    // Only delete if it belongs to this user and hasn't been delivered
     const { error } = await supabase
       .from('capsules')
       .delete()
@@ -31,7 +69,6 @@ export async function DELETE(_request, { params }) {
     if (error) throw error
     return Response.json({ success: true })
   } catch (_err) {
-    console.error('Delete error:', _err)
     return Response.json({ error: 'Failed to delete capsule' }, { status: 500 })
   }
 }
@@ -64,40 +101,15 @@ export async function PATCH(request, { params }) {
       .update(updates)
       .eq('id', id)
       .eq('user_id', user.id)
-      .eq('delivered', false) // can't edit delivered capsules
+      .eq('delivered', false)
       .select('id')
       .single()
 
     if (error) throw error
     if (!data)
       return Response.json({ error: 'Capsule not found or already delivered' }, { status: 404 })
-
     return Response.json({ success: true })
   } catch (_err) {
-    console.error('Update error:', _err)
     return Response.json({ error: 'Failed to update capsule' }, { status: 500 })
-  }
-}
-
-// ── GET /api/capsules/[id] — public preview ───────────────────────
-export async function GET(_request, { params }) {
-  try {
-    const { id } = await params
-    const supabase = getServiceClient()
-
-    const { data, error } = await supabase
-      .from('capsules')
-      .select('id, to_name, from_name, subject, deliver_at, delivered, share_enabled, created_at')
-      .eq('id', id)
-      .eq('share_enabled', true)
-      .single()
-
-    if (error || !data) return Response.json({ error: 'Capsule not found' }, { status: 404 })
-
-    // Never expose message content in public preview
-    return Response.json({ capsule: data })
-  } catch (_err) {
-    console.error('Preview error:', _err)
-    return Response.json({ error: 'Failed to fetch capsule' }, { status: 500 })
   }
 }

@@ -18,6 +18,10 @@ alter table capsules
 alter table capsules
   add column if not exists share_enabled boolean default true;
 
+-- 4. Template used for email rendering
+alter table capsules
+  add column if not exists template text default 'cosmic';
+
 -- 4. Update RLS policy to allow reading public capsule previews
 -- (only non-sensitive fields — no message content)
 create policy "Allow public preview read" on capsules

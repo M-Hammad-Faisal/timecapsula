@@ -1143,25 +1143,41 @@ export default function TimeCapsula() {
             <div className="pricing-grid">
               {[
                 {
-                  tier: 'Free',
+                  tier: 'Guest',
                   amount: '$0',
-                  desc: 'For your first capsule',
+                  desc: 'Try it instantly',
                   features: [
-                    '3 text capsules',
-                    'Up to 1 year ahead',
+                    '3 capsules total',
+                    '1 default template',
+                    'Up to 25 years ahead',
                     'Email delivery',
-                    'Basic themes',
+                    'No account needed',
                   ],
-                  cta: 'Start Free',
+                  cta: 'Try Free Now',
+                },
+                {
+                  tier: 'Free Account',
+                  amount: '$0',
+                  desc: 'Sign up, stay free',
+                  featured: true,
+                  features: [
+                    '10 capsules total',
+                    '3 premium templates',
+                    'Up to 25 years ahead',
+                    'Edit before delivery',
+                    'Shareable preview links',
+                    'Dashboard & history',
+                  ],
+                  cta: 'Sign Up Free',
                 },
                 {
                   tier: 'Personal',
                   amount: '$4',
                   per: '/mo',
                   desc: 'For the storytellers',
-                  featured: true,
                   features: [
                     'Unlimited capsules',
+                    'All 15 templates',
                     '50 years into the future',
                     'Voice note attachments',
                     'Photo & video support',
@@ -1170,29 +1186,16 @@ export default function TimeCapsula() {
                   cta: 'Go Personal',
                 },
                 {
-                  tier: 'Family',
-                  amount: '$12',
-                  per: '/mo',
-                  desc: 'For legacies',
-                  features: [
-                    'Everything in Personal',
-                    'Family vault (6 members)',
-                    'Shared memory timeline',
-                    'PDF & print export',
-                    'Custom delivery domain',
-                  ],
-                  cta: 'Build a Legacy',
-                },
-                {
                   tier: 'Lifetime',
                   amount: '$49',
                   desc: 'One time, forever',
                   special: true,
                   features: [
                     'Everything in Personal',
-                    "Locked in today's price",
                     'Lifetime storage guarantee',
+                    "Locked in today's price",
                     'Beta feature access',
+                    'Family vault (6 members)',
                   ],
                   cta: 'Own It Forever',
                 },
@@ -1212,7 +1215,11 @@ export default function TimeCapsula() {
                   <button
                     className={p.featured ? 'btn-primary' : 'btn-ghost'}
                     style={{ width: '100%' }}
-                    onClick={scrollToWrite}
+                    onClick={() => {
+                      if (p.tier === 'Guest') scrollToWrite()
+                      else if (p.tier === 'Free Account') window.location.href = '/dashboard'
+                      else scrollToWrite()
+                    }}
                   >
                     {p.cta}
                   </button>

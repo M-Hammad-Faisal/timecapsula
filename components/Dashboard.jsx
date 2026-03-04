@@ -202,13 +202,22 @@ export default function Dashboard() {
 
   const openEdit = c => {
     setEditingCapsule(c)
-    setEditForm({ subject: c.subject || '', message: '' })
-    // fetch full message
+    setEditForm({ subject: c.subject || '', message: '', loadingMessage: true })
+    // Fetch full message (auth'd owner gets full content)
     fetch(`/api/capsules/${c.id}`)
       .then(r => r.json())
       .then(d => {
-        if (d.capsule) setEditForm(f => ({ ...f }))
+        if (d.capsule?.message) {
+          setEditForm({
+            subject: d.capsule.subject || '',
+            message: d.capsule.message,
+            loadingMessage: false,
+          })
+        } else {
+          setEditForm(f => ({ ...f, loadingMessage: false }))
+        }
       })
+      .catch(() => setEditForm(f => ({ ...f, loadingMessage: false })))
   }
 
   const saveEdit = async () => {
@@ -354,22 +363,33 @@ export default function Dashboard() {
               />
             </div>
             <div className="form-group">
-              <label className="form-label">
-                New message{' '}
-                <span
-                  style={{ color: 'var(--parchment-dim)', textTransform: 'none', letterSpacing: 0 }}
+              <label className="form-label">Message</label>
+              {editForm.loadingMessage ? (
+                <div
+                  style={{
+                    padding: '1rem',
+                    color: 'var(--parchment-dim)',
+                    fontFamily: 'JetBrains Mono,monospace',
+                    fontSize: '0.75rem',
+                    letterSpacing: '0.1em',
+                    border: '1px solid rgba(232,168,76,0.15)',
+                    borderRadius: 2,
+                  }}
                 >
-                  (leave blank to keep original)
-                </span>
-              </label>
-              <textarea
-                className="form-textarea"
-                value={editForm.message}
-                onChange={e => setEditForm(f => ({ ...f, message: e.target.value }))}
-                placeholder="Write a new message..."
-                maxLength={5000}
-              />
-              <div className="char-count">{editForm.message.length} / 5000</div>
+                  ✦ Loading your message...
+                </div>
+              ) : (
+                <>
+                  <textarea
+                    className="form-textarea"
+                    value={editForm.message}
+                    onChange={e => setEditForm(f => ({ ...f, message: e.target.value }))}
+                    placeholder="Write your message..."
+                    maxLength={5000}
+                  />
+                  <div className="char-count">{editForm.message.length} / 5000</div>
+                </>
+              )}
             </div>
             <div className="modal-actions">
               <button className="btn-sm btn-ghost" onClick={() => setEditingCapsule(null)}>
@@ -410,7 +430,7 @@ export default function Dashboard() {
         </div>
         <div className="nav-right">
           <span className="user-email">{user.email}</span>
-          <button className="btn-sm btn-primary" onClick={() => (window.location.href = '/#write')}>
+          <button className="btn-sm btn-primary" onClick={() => (window.location.href = '/write')}>
             + New Capsule
           </button>
           <button className="btn-sm btn-ghost" onClick={signOut}>
@@ -455,7 +475,7 @@ export default function Dashboard() {
             </p>
             <button
               className="btn-sm btn-primary"
-              onClick={() => (window.location.href = '/#write')}
+              onClick={() => (window.location.href = '/write')}
             >
               Write Your First Capsule
             </button>
