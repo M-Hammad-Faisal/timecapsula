@@ -142,9 +142,6 @@ export default function Dashboard() {
   const [user, setUser] = useState(null)
   const [capsules, setCapsules] = useState([])
   const [loading, setLoading] = useState(true)
-  const [email, setEmail] = useState('')
-  const [magicSent, setMagicSent] = useState(false)
-  const [signingIn, setSigningIn] = useState(false)
   const [editingCapsule, setEditingCapsule] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
   const [editForm, setEditForm] = useState({ subject: '', message: '' })
@@ -183,21 +180,9 @@ export default function Dashboard() {
     setTimeout(() => setToast(null), 3000)
   }
 
-  const signIn = async () => {
-    if (!email) return
-    setSigningIn(true)
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
-    })
-    setSigningIn(false)
-    if (!error) setMagicSent(true)
-  }
-
   const signOut = async () => {
     await supabase.auth.signOut()
-    setUser(null)
-    setCapsules([])
+    window.location.href = '/login'
   }
 
   const openEdit = c => {
@@ -284,56 +269,18 @@ export default function Dashboard() {
       </>
     )
 
-  // ── Not logged in ──
-  if (!user)
+  // ── Not logged in → redirect to /login ──
+  if (!user) {
+    if (typeof window !== 'undefined') window.location.href = '/login'
     return (
       <>
         <style>{styles}</style>
-        <div className="login-screen">
-          <div className="login-card">
-            {magicSent ? (
-              <div className="magic-sent">
-                <div className="magic-icon">📬</div>
-                <h2 className="magic-title">Check your inbox</h2>
-                <p className="magic-desc">
-                  A magic link is on its way to{' '}
-                  <strong style={{ color: 'var(--amber)' }}>{email}</strong>.<br />
-                  <br />
-                  Click it to enter your vault. No password needed — ever.
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="login-icon">🔐</div>
-                <h2 className="login-title">Your Vault</h2>
-                <p className="login-desc">
-                  Sign in to see all your sealed capsules and track their journey through time.
-                </p>
-                <div className="form-group">
-                  <label className="form-label">Your email address</label>
-                  <input
-                    className="form-input"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && signIn()}
-                  />
-                </div>
-                <button
-                  className="btn-sm btn-primary btn-full"
-                  onClick={signIn}
-                  disabled={signingIn}
-                >
-                  {signingIn ? '✦ Sending magic link...' : '✦ Send Magic Link'}
-                </button>
-                <p className="login-note">No password. No fuss. Just a link in your inbox.</p>
-              </>
-            )}
-          </div>
+        <div className="loading">
+          <p className="loading-text">✦ &nbsp; redirecting &nbsp; ✦</p>
         </div>
       </>
     )
+  }
 
   const pending = capsules.filter(c => !c.delivered).length
   const delivered = capsules.filter(c => c.delivered).length

@@ -28,13 +28,18 @@ export async function proxy(request) {
   } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
 
-  // Signed-in user hits homepage → send to dashboard
+  // Signed-in user hits homepage → dashboard
   if (user && pathname === '/') {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  // /write is for signed-in users only → redirect to dashboard login
+  // /write requires auth → /login
   if (!user && pathname === '/write') {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  // Already signed in, no need to visit /login
+  if (user && pathname === '/login') {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 

@@ -663,12 +663,19 @@ function useReveal() {
 function getDeliveryText(when, customDate) {
   if (!when) return null
   const now = new Date()
-  let target
+  let target = new Date(now)
   if (when === 'custom' && customDate) {
     target = new Date(customDate)
+  } else if (when === '1w') {
+    target.setDate(now.getDate() + 7)
+  } else if (when === '1m') {
+    target.setMonth(now.getMonth() + 1)
+  } else if (when === '3m') {
+    target.setMonth(now.getMonth() + 3)
+  } else if (when === '6m') {
+    target.setMonth(now.getMonth() + 6)
   } else {
-    target = new Date(now)
-    const map = { '1y': 1, '5y': 5, '10y': 10, '25y': 25 }
+    const map = { '1y': 1, '2y': 2, '3y': 3, '5y': 5, '10y': 10, '25y': 25, '30y': 30, '50y': 50 }
     target.setFullYear(now.getFullYear() + (map[when] || 0))
   }
   const diff = Math.ceil((target - now) / (1000 * 60 * 60 * 24))
@@ -804,7 +811,7 @@ export default function TimeCapsula() {
         <div className="nav-links">
           <a href="#how">How it works</a>
           <a href="#pricing">Pricing</a>
-          <a href="/dashboard" style={{ color: 'var(--amber)' }}>
+          <a href="/login" style={{ color: 'var(--amber)' }}>
             Sign In
           </a>
           <a
@@ -1064,11 +1071,13 @@ export default function TimeCapsula() {
                       onChange={e => setForm(f => ({ ...f, when: e.target.value }))}
                     >
                       <option value="">Choose a time...</option>
-                      <option value="1y">1 year from now</option>
-                      <option value="5y">5 years from now</option>
-                      <option value="10y">10 years from now</option>
-                      <option value="25y">25 years from now</option>
-                      <option value="custom">Pick a specific date</option>
+                      <option value="1w">1 week from now</option>
+                      <option value="1m">1 month from now</option>
+                      <option value="3m">3 months from now</option>
+                      <option value="6m">6 months from now</option>
+                      <option disabled value="">
+                        ── Sign in for more options ──
+                      </option>
                     </select>
                   </div>
                   {form.when === 'custom' && (
@@ -1117,10 +1126,7 @@ export default function TimeCapsula() {
                     }}
                   >
                     Free · No account required for your first capsule ·{' '}
-                    <a
-                      href="/dashboard"
-                      style={{ color: 'var(--amber)', textDecoration: 'underline' }}
-                    >
+                    <a href="/login" style={{ color: 'var(--amber)', textDecoration: 'underline' }}>
                       Sign in
                     </a>{' '}
                     for unlimited
@@ -1145,25 +1151,24 @@ export default function TimeCapsula() {
                 {
                   tier: 'Guest',
                   amount: '$0',
-                  desc: 'Try it instantly',
+                  desc: 'Try it instantly — no signup',
                   features: [
                     '3 capsules total',
+                    'Deliver up to 6 months ahead',
                     '1 default template',
-                    'Up to 25 years ahead',
                     'Email delivery',
-                    'No account needed',
                   ],
                   cta: 'Try Free Now',
                 },
                 {
                   tier: 'Free Account',
                   amount: '$0',
-                  desc: 'Sign up, stay free',
+                  desc: 'Sign up, stay free forever',
                   featured: true,
                   features: [
                     '10 capsules total',
-                    '3 premium templates',
-                    'Up to 25 years ahead',
+                    'Deliver up to 3 years ahead',
+                    '3 free templates',
                     'Edit before delivery',
                     'Shareable preview links',
                     'Dashboard & history',
@@ -1177,25 +1182,26 @@ export default function TimeCapsula() {
                   desc: 'For the storytellers',
                   features: [
                     'Unlimited capsules',
-                    'All 15 templates',
-                    '50 years into the future',
+                    'Deliver up to 10 years ahead',
+                    'All 15 templates included',
                     'Voice note attachments',
-                    'Photo & video support',
+                    'Photo support',
                     'Priority delivery',
                   ],
                   cta: 'Go Personal',
                 },
                 {
-                  tier: 'Lifetime',
+                  tier: 'Ultimate',
                   amount: '$49',
                   desc: 'One time, forever',
                   special: true,
                   features: [
                     'Everything in Personal',
+                    'Deliver up to 50 years ahead',
                     'Lifetime storage guarantee',
-                    "Locked in today's price",
-                    'Beta feature access',
                     'Family vault (6 members)',
+                    'Beta feature access',
+                    'Locked-in price forever',
                   ],
                   cta: 'Own It Forever',
                 },
@@ -1217,7 +1223,7 @@ export default function TimeCapsula() {
                     style={{ width: '100%' }}
                     onClick={() => {
                       if (p.tier === 'Guest') scrollToWrite()
-                      else if (p.tier === 'Free Account') window.location.href = '/dashboard'
+                      else if (p.tier === 'Free Account') window.location.href = '/login'
                       else scrollToWrite()
                     }}
                   >

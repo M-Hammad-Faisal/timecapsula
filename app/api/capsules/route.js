@@ -136,15 +136,40 @@ export async function GET() {
 
 function computeDeliveryDate(when, customDate) {
   const now = new Date()
+  const target = new Date(now)
   if (when === 'custom') {
     if (!customDate) return null
     const d = new Date(customDate)
     return isNaN(d.getTime()) ? null : d
   }
-  const yearsMap = { '1y': 1, '5y': 5, '10y': 10, '25y': 25 }
+  if (when === '1w') {
+    target.setDate(now.getDate() + 7)
+    return target
+  }
+  if (when === '1m') {
+    target.setMonth(now.getMonth() + 1)
+    return target
+  }
+  if (when === '3m') {
+    target.setMonth(now.getMonth() + 3)
+    return target
+  }
+  if (when === '6m') {
+    target.setMonth(now.getMonth() + 6)
+    return target
+  }
+  const yearsMap = {
+    '1y': 1,
+    '2y': 2,
+    '3y': 3,
+    '5y': 5,
+    '10y': 10,
+    '25y': 25,
+    '30y': 30,
+    '50y': 50,
+  }
   const years = yearsMap[when]
   if (!years) return null
-  const target = new Date(now)
   target.setFullYear(now.getFullYear() + years)
   return target
 }
