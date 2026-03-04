@@ -156,14 +156,18 @@ export default function Dashboard() {
 
   useEffect(() => {
     const init = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       setUser(user)
       if (user) await fetchCapsules()
       setLoading(false)
     }
     init()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null)
       if (session?.user) await fetchCapsules()
     })
@@ -196,71 +200,80 @@ export default function Dashboard() {
     setCapsules([])
   }
 
-  const daysUntil = (date) => {
+  const daysUntil = date => {
     const diff = Math.ceil((new Date(date) - new Date()) / (1000 * 60 * 60 * 24))
     return Math.max(0, diff)
   }
 
-  const formatDate = (date) => new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric', month: 'short', day: 'numeric'
-  })
+  const formatDate = date =>
+    new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
 
   // ── Loading ──
-  if (loading) return (
-    <>
-      <style>{styles}</style>
-      <div className="loading"><p className="loading-text">✦ &nbsp; opening vault &nbsp; ✦</p></div>
-    </>
-  )
+  if (loading)
+    return (
+      <>
+        <style>{styles}</style>
+        <div className="loading">
+          <p className="loading-text">✦ &nbsp; opening vault &nbsp; ✦</p>
+        </div>
+      </>
+    )
 
   // ── Not logged in ──
-  if (!user) return (
-    <>
-      <style>{styles}</style>
-      <div className="login-screen">
-        <div className="login-card">
-          {magicSent ? (
-            <div className="magic-sent">
-              <div className="magic-icon">📬</div>
-              <h2 className="magic-title">Check your inbox</h2>
-              <p className="magic-desc">
-                A magic link is on its way to <strong style={{ color: 'var(--amber)' }}>{email}</strong>.
-                <br /><br />
-                Click it to enter your vault. No password needed — ever.
-              </p>
-            </div>
-          ) : (
-            <>
-              <div className="login-icon">🔐</div>
-              <h2 className="login-title">Your Vault</h2>
-              <p className="login-desc">
-                Sign in to see all your sealed capsules and track their journey through time.
-              </p>
-              <div className="form-group">
-                <label className="form-label">Your email address</label>
-                <input
-                  className="form-input"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && signIn()}
-                />
+  if (!user)
+    return (
+      <>
+        <style>{styles}</style>
+        <div className="login-screen">
+          <div className="login-card">
+            {magicSent ? (
+              <div className="magic-sent">
+                <div className="magic-icon">📬</div>
+                <h2 className="magic-title">Check your inbox</h2>
+                <p className="magic-desc">
+                  A magic link is on its way to{' '}
+                  <strong style={{ color: 'var(--amber)' }}>{email}</strong>.
+                  <br />
+                  <br />
+                  Click it to enter your vault. No password needed — ever.
+                </p>
               </div>
-              <button
-                className="btn-sm btn-primary btn-full"
-                onClick={signIn}
-                disabled={signingIn}
-              >
-                {signingIn ? '✦ Sending magic link...' : '✦ Send Magic Link'}
-              </button>
-              <p className="login-note">No password. No fuss. Just a link in your inbox.</p>
-            </>
-          )}
+            ) : (
+              <>
+                <div className="login-icon">🔐</div>
+                <h2 className="login-title">Your Vault</h2>
+                <p className="login-desc">
+                  Sign in to see all your sealed capsules and track their journey through time.
+                </p>
+                <div className="form-group">
+                  <label className="form-label">Your email address</label>
+                  <input
+                    className="form-input"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && signIn()}
+                  />
+                </div>
+                <button
+                  className="btn-sm btn-primary btn-full"
+                  onClick={signIn}
+                  disabled={signingIn}
+                >
+                  {signingIn ? '✦ Sending magic link...' : '✦ Send Magic Link'}
+                </button>
+                <p className="login-note">No password. No fuss. Just a link in your inbox.</p>
+              </>
+            )}
+          </div>
         </div>
-      </div>
-    </>
-  )
+      </>
+    )
 
   // ── Dashboard ──
   const pending = capsules.filter(c => !c.delivered).length
@@ -271,22 +284,26 @@ export default function Dashboard() {
       <style>{styles}</style>
 
       <nav>
-        <div className="logo" onClick={() => window.location.href = '/'}>
+        <div className="logo" onClick={() => (window.location.href = '/')}>
           Time<em>Capsula</em>
         </div>
         <div className="nav-right">
           <span className="user-email">{user.email}</span>
-          <button className="btn-sm btn-primary" onClick={() => window.location.href = '/#write'}>
+          <button className="btn-sm btn-primary" onClick={() => (window.location.href = '/#write')}>
             + New Capsule
           </button>
-          <button className="btn-sm btn-ghost" onClick={signOut}>Sign Out</button>
+          <button className="btn-sm btn-ghost" onClick={signOut}>
+            Sign Out
+          </button>
         </div>
       </nav>
 
       <div className="dashboard">
         <div className="page-header">
           <p className="page-eyebrow">✦ Your vault</p>
-          <h1 className="page-title">Your sealed <em>capsules.</em></h1>
+          <h1 className="page-title">
+            Your sealed <em>capsules.</em>
+          </h1>
         </div>
 
         {/* Stats */}
@@ -314,8 +331,13 @@ export default function Dashboard() {
           <div className="empty-state">
             <div className="empty-icon">✉️</div>
             <h3 className="empty-title">No capsules yet</h3>
-            <p className="empty-desc">Your vault is empty. Seal your first message to someone you love.</p>
-            <button className="btn-sm btn-primary" onClick={() => window.location.href = '/#write'}>
+            <p className="empty-desc">
+              Your vault is empty. Seal your first message to someone you love.
+            </p>
+            <button
+              className="btn-sm btn-primary"
+              onClick={() => (window.location.href = '/#write')}
+            >
               Write Your First Capsule
             </button>
           </div>
@@ -328,7 +350,9 @@ export default function Dashboard() {
                   {c.subject && <div className="capsule-subject">"{c.subject}"</div>}
                   <div className="capsule-meta">
                     <span className="capsule-date">
-                      {c.delivered ? `Delivered ${formatDate(c.deliver_at)}` : `Opens ${formatDate(c.deliver_at)}`}
+                      {c.delivered
+                        ? `Delivered ${formatDate(c.deliver_at)}`
+                        : `Opens ${formatDate(c.deliver_at)}`}
                     </span>
                     <span className={`badge ${c.delivered ? 'badge-delivered' : 'badge-pending'}`}>
                       {c.delivered ? '✓ Delivered' : '⏳ Sealed'}

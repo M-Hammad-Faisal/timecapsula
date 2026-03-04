@@ -24,10 +24,13 @@ export async function POST(request) {
 
     const deliverAt = computeDeliveryDate(when, customDate)
     if (!deliverAt) return Response.json({ error: 'Invalid delivery time' }, { status: 400 })
-    if (deliverAt <= new Date()) return Response.json({ error: 'Delivery date must be in the future' }, { status: 400 })
+    if (deliverAt <= new Date())
+      return Response.json({ error: 'Delivery date must be in the future' }, { status: 400 })
 
     const userClient = await createUserClient()
-    const { data: { user } } = await userClient.auth.getUser()
+    const {
+      data: { user },
+    } = await userClient.auth.getUser()
 
     const { data, error } = await supabase
       .from('capsules')
@@ -49,7 +52,6 @@ export async function POST(request) {
     }
 
     return Response.json({ success: true, id: data.id, deliverAt: data.deliver_at })
-
   } catch (err) {
     console.error('Unexpected error:', err)
     return Response.json({ error: 'Something went wrong' }, { status: 500 })
@@ -59,7 +61,9 @@ export async function POST(request) {
 export async function GET() {
   try {
     const userClient = await createUserClient()
-    const { data: { user } } = await userClient.auth.getUser()
+    const {
+      data: { user },
+    } = await userClient.auth.getUser()
 
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -72,7 +76,6 @@ export async function GET() {
     if (error) throw error
 
     return Response.json({ capsules: data })
-
   } catch (err) {
     console.error('Error fetching capsules:', err)
     return Response.json({ error: 'Failed to fetch capsules' }, { status: 500 })

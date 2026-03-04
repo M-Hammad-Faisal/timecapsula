@@ -19,11 +19,14 @@ export default [
       },
     },
     rules: {
-      'no-unused-vars': ['warn', {
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^(_|[A-Z])',
-        caughtErrorsIgnorePattern: '^_',  // ← fixes catch (_err)
-      }],
+      'no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^(_|[A-Z])',
+          caughtErrorsIgnorePattern: '^_', // ← fixes catch (_err)
+        },
+      ],
       'prefer-const': 'error',
       'no-var': 'error',
       eqeqeq: ['error', 'always'],
@@ -39,12 +42,6 @@ export default [
   },
 
   {
-    ignores: [
-      'supabase/functions/**',
-      '.next/**',
-      'node_modules/**',
-      'out/**',
-      'build/**',
-    ],
+    ignores: ['supabase/functions/**', '.next/**', 'node_modules/**', 'out/**', 'build/**'],
   },
 ]
