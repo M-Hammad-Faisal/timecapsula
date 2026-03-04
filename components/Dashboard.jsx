@@ -290,6 +290,9 @@ const styles = `
     text-transform:uppercase;padding:3px 9px;border-radius:2px;}
   .badge-pending{background:rgba(232,168,76,0.1);color:var(--amber);border:1px solid rgba(232,168,76,0.28);}
   .badge-delivered{background:rgba(100,200,100,0.1);color:#7dc97d;border:1px solid rgba(100,200,100,0.28);}
+  .capsule-delivered{border-color:rgba(125,201,125,0.12);opacity:0.8;}
+  .capsule-delivered:hover{border-color:rgba(125,201,125,0.25);}
+  .delivered-note{margin-top:0.75rem;padding:0.55rem 0.85rem;background:rgba(125,201,125,0.04);border:1px solid rgba(125,201,125,0.12);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:rgba(125,201,125,0.55);letter-spacing:0.04em;line-height:1.5;}
   .days-left{font-family:'Playfair Display',serif;font-size:1.75rem;color:rgba(232,168,76,0.4);text-align:right;line-height:1;}
   .days-label{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--dim);text-align:right;letter-spacing:0.1em;text-transform:uppercase;}
   .card-actions{display:flex;gap:0.45rem;margin-top:1rem;padding-top:1rem;
@@ -986,15 +989,26 @@ export default function Dashboard() {
               <div className="confirm-box">
                 <h3 className="confirm-title">Delete this capsule?</h3>
                 <p className="confirm-desc">
-                  This cannot be undone. The message will be gone forever — it will never reach its
-                  recipient.
+                  This cannot be undone. The capsule will be permanently removed — your recipient
+                  will never receive it.
+                </p>
+                <p
+                  style={{
+                    fontFamily: 'monospace',
+                    fontSize: '0.62rem',
+                    color: 'rgba(232,168,76,0.6)',
+                    marginTop: '0.75rem',
+                    letterSpacing: '0.06em',
+                  }}
+                >
+                  Only undelivered capsules can be deleted.
                 </p>
                 <div className="confirm-actions">
                   <button className="btn-sm btn-ghost" onClick={() => setDeletingId(null)}>
                     Keep it
                   </button>
                   <button className="btn-sm btn-danger" onClick={() => deleteCapsule(deletingId)}>
-                    Delete
+                    Yes, delete
                   </button>
                 </div>
               </div>
@@ -1051,7 +1065,10 @@ export default function Dashboard() {
             ) : (
               <div className="capsule-list">
                 {capsules.map(c => (
-                  <div className="capsule-card" key={c.id}>
+                  <div
+                    className={`capsule-card ${c.delivered ? 'capsule-delivered' : ''}`}
+                    key={c.id}
+                  >
                     <div className="capsule-card-row">
                       <div>
                         <div className="capsule-to">To: {c.to_name}</div>
@@ -1075,6 +1092,23 @@ export default function Dashboard() {
                             {daysUntil(c.deliver_at).toLocaleString()}
                           </div>
                           <div className="days-label">days left</div>
+                        </div>
+                      )}
+                      {c.delivered && (
+                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                          <div style={{ fontSize: '1.5rem' }}>📬</div>
+                          <div
+                            style={{
+                              fontFamily: 'monospace',
+                              fontSize: '0.55rem',
+                              color: 'rgba(125,201,125,0.6)',
+                              letterSpacing: '0.1em',
+                              textTransform: 'uppercase',
+                              marginTop: '4px',
+                            }}
+                          >
+                            sent
+                          </div>
                         </div>
                       )}
                     </div>
@@ -1102,6 +1136,13 @@ export default function Dashboard() {
                         <button className="btn-sm btn-danger" onClick={() => setDeletingId(c.id)}>
                           ✕ Delete
                         </button>
+                      </div>
+                    )}
+
+                    {c.delivered && (
+                      <div className="delivered-note">
+                        This capsule has been delivered and is now sealed in time. It cannot be
+                        edited or deleted.
                       </div>
                     )}
                   </div>
