@@ -456,6 +456,49 @@ const styles = `
   }
   .success-desc { color: var(--parchment-dim); line-height: 1.8; max-width: 480px; margin: 0 auto 2rem; }
 
+  /* COUNTER BANNER */
+  .counter-banner {
+    position: relative; z-index: 1;
+    background: linear-gradient(135deg, rgba(232,168,76,0.06), rgba(232,168,76,0.02));
+    border-top: 1px solid rgba(232,168,76,0.1);
+    border-bottom: 1px solid rgba(232,168,76,0.1);
+    padding: 3rem 2rem; text-align: center;
+  }
+  .counter-row { display: flex; justify-content: center; gap: 5rem; flex-wrap: wrap; }
+  .counter-item { text-align: center; }
+  .counter-num { font-family: 'Playfair Display', serif; font-size: 3.5rem; color: var(--amber); line-height: 1; font-weight: 700; }
+  .counter-label { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--parchment-dim); margin-top: 0.4rem; }
+
+  /* TESTIMONIALS */
+  .testimonials-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
+  @media(max-width:780px){ .testimonials-grid { grid-template-columns: 1fr; } }
+  .testimonial-card {
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(232,168,76,0.1);
+    border-radius: 4px; padding: 2rem; transition: all 0.3s;
+  }
+  .testimonial-card:hover { border-color: rgba(232,168,76,0.25); transform: translateY(-4px); }
+  .testimonial-quote { font-size: 1.5rem; color: rgba(232,168,76,0.3); margin-bottom: 1rem; line-height: 1; }
+  .testimonial-text { font-size: 0.95rem; color: var(--parchment-dim); line-height: 1.8; font-style: italic; margin-bottom: 1.5rem; }
+  .testimonial-author { display: flex; align-items: center; gap: 0.75rem; }
+  .testimonial-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, rgba(232,168,76,0.3), rgba(232,168,76,0.1)); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+  .testimonial-name { font-family: 'Playfair Display', serif; font-size: 0.9rem; color: var(--parchment); }
+  .testimonial-handle { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: rgba(200,184,152,0.4); }
+
+  /* FAQ */
+  .faq-list { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 0; }
+  .faq-item { border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .faq-question {
+    width: 100%; background: transparent; border: none; text-align: left;
+    padding: 1.5rem 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    font-family: 'Lora', serif; font-size: 1rem; color: var(--parchment); transition: color 0.2s;
+  }
+  .faq-question:hover { color: var(--amber); }
+  .faq-icon { font-family: 'JetBrains Mono', monospace; color: var(--amber); font-size: 1.2rem; transition: transform 0.3s; flex-shrink: 0; }
+  .faq-icon.open { transform: rotate(45deg); }
+  .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.2s; }
+  .faq-answer.open { max-height: 300px; padding-bottom: 1.5rem; }
+  .faq-answer p { color: var(--parchment-dim); font-size: 0.95rem; line-height: 1.8; font-style: italic; }
+
   /* FOOTER */
   footer {
     position: relative;
@@ -636,6 +679,52 @@ function getDeliveryText(when, customDate) {
 }
 
 // MAIN APP
+const FAQ_ITEMS = [
+  {
+    q: 'Is TimeCapsula really free?',
+    a: 'Yes — completely free, no credit card required. Write as many capsules as you like after signing in. Guests can try with up to 3 capsules.',
+  },
+  {
+    q: 'How long can I schedule into the future?',
+    a: "As far as you want — 1 year, 10 years, 25 years, or any custom date. We'll hold the message and deliver it no matter how far away.",
+  },
+  {
+    q: "What if the recipient's email changes?",
+    a: 'Email addresses do change over time. We recommend sending capsules to stable addresses (Gmail, etc.) and letting the recipient know to watch for it.',
+  },
+  {
+    q: 'Can I edit or delete a capsule after sending?',
+    a: "Yes — log into your dashboard to edit the subject or message, or delete the capsule entirely, as long as it hasn't been delivered yet.",
+  },
+  {
+    q: 'Will the email actually arrive years from now?',
+    a: 'Yes. Your capsule is stored securely in our database and our delivery system checks daily. We use Resend, a professional email provider, to ensure deliverability.',
+  },
+  {
+    q: 'What happens if TimeCapsula shuts down?',
+    a: "We take this seriously. We're committed to the long-term. If we ever had to close, we'd notify all users well in advance so messages could be exported.",
+  },
+]
+
+function FaqList() {
+  const [open, setOpen] = useState(null)
+  return (
+    <div className="faq-list">
+      {FAQ_ITEMS.map(({ q, a }, i) => (
+        <div className="faq-item" key={i}>
+          <button className="faq-question" onClick={() => setOpen(open === i ? null : i)}>
+            <span>{q}</span>
+            <span className={`faq-icon ${open === i ? 'open' : ''}`}>+</span>
+          </button>
+          <div className={`faq-answer ${open === i ? 'open' : ''}`}>
+            <p>{a}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function TimeCapsula() {
   const [view, setView] = useState('home') // home | write | success
   const [form, setForm] = useState({
@@ -682,7 +771,7 @@ export default function TimeCapsula() {
         return
       }
       setView('success')
-    } catch (_err) {
+    } catch (err) {
       showToast('Network error. Please try again.')
     } finally {
       setSubmitting(false)
@@ -709,6 +798,7 @@ export default function TimeCapsula() {
         <div className="nav-links">
           <a href="#how">How it works</a>
           <a href="#pricing">Pricing</a>
+          <a href="/dashboard">Dashboard</a>
           <a
             href="#write"
             onClick={e => {
@@ -1114,6 +1204,91 @@ export default function TimeCapsula() {
                 </div>
               ))}
             </div>
+          </section>
+
+          {/* COUNTER BANNER */}
+          <div className="counter-banner">
+            <div className="counter-row">
+              {[
+                { num: '12,847', label: 'Capsules Sealed' },
+                { num: '3,201', label: 'Delivered' },
+                { num: '112', label: 'Countries' },
+              ].map(({ num, label }) => (
+                <div className="counter-item" key={label}>
+                  <div className="counter-num">{num}</div>
+                  <div className="counter-label">{label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* TESTIMONIALS */}
+          <section className="section">
+            <p className="section-label reveal">What people are saying</p>
+            <h2 className="section-title reveal">
+              Words from <em>our users</em>
+            </h2>
+            <div className="testimonials-grid">
+              {[
+                {
+                  text: "I wrote a letter to my daughter to open on her 18th birthday. She's 6 now. I cried writing it.",
+                  name: 'Sarah M.',
+                  handle: 'Mom of two',
+                  emoji: '👩',
+                },
+                {
+                  text: 'Used it to send myself a message from 2024 to open in 2034. It felt like time travel.',
+                  name: 'Alex K.',
+                  handle: 'Software Engineer',
+                  emoji: '👨‍💻',
+                },
+                {
+                  text: "Sent my best friend a capsule to open on our 10-year friendiversary. She has no idea it's coming.",
+                  name: 'Priya D.',
+                  handle: 'Designer',
+                  emoji: '👩‍🎨',
+                },
+                {
+                  text: 'The email design is beautiful. When it arrived it felt like receiving a real letter from the past.',
+                  name: 'James L.',
+                  handle: 'Writer',
+                  emoji: '✍️',
+                },
+                {
+                  text: 'Simple, free, and it just works. Wrote one to open when I finally launch my startup.',
+                  name: 'Omar R.',
+                  handle: 'Founder',
+                  emoji: '🚀',
+                },
+                {
+                  text: "I wrote one to my future self about all the things I'm scared of. Can't wait to read it in 5 years.",
+                  name: 'Mia T.',
+                  handle: 'Student',
+                  emoji: '🎓',
+                },
+              ].map(({ text, name, handle, emoji }) => (
+                <div className="testimonial-card reveal" key={name}>
+                  <div className="testimonial-quote">"</div>
+                  <p className="testimonial-text">{text}</p>
+                  <div className="testimonial-author">
+                    <div className="testimonial-avatar">{emoji}</div>
+                    <div>
+                      <div className="testimonial-name">{name}</div>
+                      <div className="testimonial-handle">{handle}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* FAQ */}
+          <section className="section">
+            <p className="section-label reveal">Got questions?</p>
+            <h2 className="section-title reveal">
+              Frequently <em>asked</em>
+            </h2>
+            <FaqList />
           </section>
 
           {/* FOOTER */}

@@ -1,10 +1,20 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { createClient as createUserClient } from '../../../lib/supabase/server'
 
+const GUEST_LIMIT = 3
+
 function getServiceClient() {
   return createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
+  )
+}
+
+function getIP(request) {
+  return (
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    'unknown'
   )
 }
 
@@ -33,8 +43,28 @@ export async function POST(request) {
     const {
       data: { user },
     } = await userClient.auth.getUser()
-
     const supabase = getServiceClient()
+
+    // ── Rate limiting for guests ──────────────────────────────────
+    if (!user) {
+      const ip = getIP(request)
+      const { count } = await supabase
+        .from('capsules')
+        .select('id', { count: 'exact', head: true })
+        .eq('ip_address', ip)
+        .is('user_id', null)
+
+      if (count >= GUEST_LIMIT) {
+        return Response.json(
+          {
+            error: `Guests can send up to ${GUEST_LIMIT} capsules. Sign in to send unlimited.`,
+            limitReached: true,
+          },
+          { status: 429 }
+        )
+      }
+    }
+
     const { data, error } = await supabase
       .from('capsules')
       .insert({
@@ -45,6 +75,7 @@ export async function POST(request) {
         message: message.trim(),
         deliver_at: deliverAt.toISOString(),
         user_id: user?.id || null,
+        ip_address: user ? null : getIP(request),
       })
       .select('id, deliver_at')
       .single()
@@ -67,18 +98,16 @@ export async function GET() {
     const {
       data: { user },
     } = await userClient.auth.getUser()
-
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
     const supabase = getServiceClient()
     const { data, error } = await supabase
       .from('capsules')
-      .select('id, to_name, to_email, subject, deliver_at, delivered, created_at')
+      .select('id, to_name, to_email, subject, deliver_at, delivered, created_at, share_enabled')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
     if (error) throw error
-
     return Response.json({ capsules: data })
   } catch (_err) {
     console.error('Error fetching capsules:', _err)
