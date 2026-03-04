@@ -413,6 +413,8 @@ const styles = `
   }
   .form-textarea { min-height: 280px; resize: vertical; line-height: 1.8; }
   .form-select { cursor: pointer; }
+  input[type="date"].form-input { color-scheme: dark; cursor: pointer; }
+  input[type="date"].form-input::-webkit-calendar-picker-indicator { filter: invert(0.7) sepia(1) saturate(3) hue-rotate(5deg); cursor: pointer; }
   .form-select option { background: var(--cosmos); }
 
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
@@ -771,7 +773,7 @@ export default function TimeCapsula() {
         return
       }
       setView('success')
-    } catch (err) {
+    } catch (_err) {
       showToast('Network error. Please try again.')
     } finally {
       setSubmitting(false)
@@ -782,7 +784,11 @@ export default function TimeCapsula() {
     setView('home')
     setTimeout(() => {
       writeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 100)
+      // Force reveal all elements in the write section after navigation
+      setTimeout(() => {
+        document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'))
+      }, 150)
+    }, 200)
   }
 
   return (
@@ -798,7 +804,9 @@ export default function TimeCapsula() {
         <div className="nav-links">
           <a href="#how">How it works</a>
           <a href="#pricing">Pricing</a>
-          <a href="/dashboard">Dashboard</a>
+          <a href="/dashboard" style={{ color: 'var(--amber)' }}>
+            Sign In
+          </a>
           <a
             href="#write"
             onClick={e => {
@@ -1064,7 +1072,7 @@ export default function TimeCapsula() {
                     </select>
                   </div>
                   {form.when === 'custom' && (
-                    <div className="form-group reveal">
+                    <div className="form-group">
                       <label className="form-label">Delivery date</label>
                       <input
                         className="form-input"
@@ -1108,7 +1116,14 @@ export default function TimeCapsula() {
                       fontStyle: 'italic',
                     }}
                   >
-                    Free · No account required for your first capsule
+                    Free · No account required for your first capsule ·{' '}
+                    <a
+                      href="/dashboard"
+                      style={{ color: 'var(--amber)', textDecoration: 'underline' }}
+                    >
+                      Sign in
+                    </a>{' '}
+                    for unlimited
                   </p>
                 </div>
               </div>
