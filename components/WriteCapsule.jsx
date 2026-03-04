@@ -3,38 +3,20 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '../lib/supabase/client'
 
-// ── Plan delivery options ─────────────────────────────────────────
-const DELIVERY_BY_PLAN = {
-  guest: [
-    { value: '1w', label: '1 week from now' },
-    { value: '1m', label: '1 month from now' },
-    { value: '3m', label: '3 months from now' },
-    { value: '6m', label: '6 months from now' },
-    { value: 'custom-6m', label: 'Pick a date (within 6 months)' },
-  ],
-  free: [
-    { value: '1w', label: '1 week from now' },
-    { value: '1m', label: '1 month from now' },
-    { value: '3m', label: '3 months from now' },
-    { value: '6m', label: '6 months from now' },
-    { value: '1y', label: '1 year from now' },
-    { value: '2y', label: '2 years from now' },
-    { value: '3y', label: '3 years from now' },
-    { value: 'custom-3y', label: 'Pick a date (within 3 years)' },
-  ],
-  premium: [
-    { value: '1w', label: '1 week from now' },
-    { value: '1m', label: '1 month from now' },
-    { value: '3m', label: '3 months from now' },
-    { value: '6m', label: '6 months from now' },
-    { value: '1y', label: '1 year from now' },
-    { value: '2y', label: '2 years from now' },
-    { value: '3y', label: '3 years from now' },
-    { value: '5y', label: '5 years from now' },
-    { value: '10y', label: '10 years from now' },
-    { value: 'custom', label: 'Pick any date' },
-  ],
-}
+// ── Constants ─────────────────────────────────────────────────────
+const FREE_LIMIT = 10
+const FREE_IDS = ['cosmic', 'dawn', 'midnight-letter']
+
+const DELIVERY_OPTIONS = [
+  { value: '1w', label: '1 week from now' },
+  { value: '1m', label: '1 month from now' },
+  { value: '3m', label: '3 months from now' },
+  { value: '6m', label: '6 months from now' },
+  { value: '1y', label: '1 year from now' },
+  { value: '2y', label: '2 years from now' },
+  { value: '3y', label: '3 years from now' },
+  { value: 'custom-3y', label: 'Pick a date (within 3 years)' },
+]
 
 // ── Templates ─────────────────────────────────────────────────────
 const TEMPLATES = [
@@ -94,7 +76,6 @@ const TEMPLATES = [
   {
     id: 'first-birthday',
     tier: 'premium',
-    price: { lifetime: 5, uses: 1 },
     scenario: '🎂 For a child',
     name: 'First Birthday',
     desc: 'Sweet · Gentle · Parental love',
@@ -113,7 +94,6 @@ const TEMPLATES = [
   {
     id: 'graduation',
     tier: 'premium',
-    price: { lifetime: 5, uses: 1 },
     scenario: '🎓 For a student',
     name: 'Graduation Day',
     desc: 'Proud · Encouraging · Achievement',
@@ -132,7 +112,6 @@ const TEMPLATES = [
   {
     id: 'wedding',
     tier: 'premium',
-    price: { lifetime: 5, uses: 1 },
     scenario: '💍 For a partner',
     name: 'Wedding Vows',
     desc: 'Romantic · Intimate · Eternal',
@@ -151,7 +130,6 @@ const TEMPLATES = [
   {
     id: 'startup',
     tier: 'premium',
-    price: { lifetime: 5, uses: 1 },
     scenario: '🚀 For a founder',
     name: 'Day One',
     desc: 'Ambitious · Raw · Entrepreneurial',
@@ -170,7 +148,6 @@ const TEMPLATES = [
   {
     id: 'grief',
     tier: 'premium',
-    price: { lifetime: 5, uses: 1 },
     scenario: '🕊️ After a loss',
     name: 'In Loving Memory',
     desc: 'Tender · Healing · Comforting',
@@ -189,7 +166,6 @@ const TEMPLATES = [
   {
     id: 'retirement',
     tier: 'premium',
-    price: { lifetime: 5, uses: 1 },
     scenario: '🌿 For retirement',
     name: 'Golden Years',
     desc: 'Reflective · Grateful · Wise',
@@ -208,7 +184,6 @@ const TEMPLATES = [
   {
     id: 'new-year',
     tier: 'premium',
-    price: { lifetime: 5, uses: 1 },
     scenario: '🎊 New Year',
     name: 'Dear January',
     desc: 'Hopeful · Resolute · Fresh start',
@@ -227,7 +202,6 @@ const TEMPLATES = [
   {
     id: 'apology',
     tier: 'premium',
-    price: { lifetime: 5, uses: 1 },
     scenario: '🤝 To make peace',
     name: 'Unsent Words',
     desc: 'Vulnerable · Honest · Healing',
@@ -246,7 +220,6 @@ const TEMPLATES = [
   {
     id: 'milestone',
     tier: 'premium',
-    price: { lifetime: 5, uses: 1 },
     scenario: '🏆 For a milestone',
     name: 'The Summit',
     desc: 'Triumphant · Proud · Celebratory',
@@ -265,7 +238,6 @@ const TEMPLATES = [
   {
     id: 'friendship',
     tier: 'premium',
-    price: { lifetime: 5, uses: 1 },
     scenario: '👫 For a best friend',
     name: 'Old Friends',
     desc: 'Warm · Nostalgic · Playful',
@@ -284,7 +256,6 @@ const TEMPLATES = [
   {
     id: 'diagnosis',
     tier: 'premium',
-    price: { lifetime: 5, uses: 1 },
     scenario: '💙 Through illness',
     name: 'Brave Words',
     desc: 'Courageous · Raw · Deeply human',
@@ -303,7 +274,6 @@ const TEMPLATES = [
   {
     id: 'parchment',
     tier: 'premium',
-    price: { lifetime: 5, uses: 1 },
     scenario: '📜 Classic letter',
     name: 'Vintage Parchment',
     desc: 'Aged · Literary · Timeless',
@@ -321,23 +291,41 @@ const TEMPLATES = [
   },
 ]
 
-const FREE_IDS = ['cosmic', 'dawn', 'midnight-letter']
-const FREE_LIMIT = 10
+// ── Helpers ───────────────────────────────────────────────────────
+function computeDelivery(when, customDate) {
+  if (!when) return null
+  if (when.startsWith('custom')) {
+    if (!customDate) return null
+    const d = new Date(customDate)
+    return isNaN(d.getTime()) ? null : d
+  }
+  const days = { '1w': 7, '1m': 30, '3m': 90, '6m': 180, '1y': 365, '2y': 730, '3y': 1095 }[when]
+  return days ? new Date(Date.now() + days * 86400000) : null
+}
 
-// ── Email Preview Component ───────────────────────────────────────
+function fmtDate(d) {
+  return d?.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) || ''
+}
+
+function customMax(when) {
+  if (when === 'custom-3y')
+    return new Date(Date.now() + 1095 * 86400000).toISOString().split('T')[0]
+  return undefined
+}
+
+// ── Email Preview ─────────────────────────────────────────────────
 export function EmailPreview({ templateId, form, compact }) {
-  const tmpl = TEMPLATES.find(t => t.id === templateId) || TEMPLATES[0]
-  const e = tmpl.email
+  const t = TEMPLATES.find(x => x.id === templateId) || TEMPLATES[0]
+  const e = t.email
   const to = form.to || 'Recipient'
-  const from = form.from || 'Someone who cares'
-  const subject = form.subject || tmpl.name
-  const message = form.message || tmpl.placeholder
-  const msgHTML = message
+  const fr = form.from || 'Someone who cares'
+  const su = form.subject || t.name
+  const ms = form.message || t.placeholder
+  const ht = ms
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/\n/g, '<br/>')
-  const pad = compact ? '14px 18px' : '22px 26px'
   const fs = compact ? 12 : 14
 
   return (
@@ -360,34 +348,34 @@ export function EmailPreview({ templateId, form, compact }) {
           gap: 5,
         }}
       >
-        {['rgba(255,80,80,0.6)', 'rgba(255,200,0,0.6)', 'rgba(80,200,80,0.6)'].map((c, i) => (
+        {['rgba(255,80,80,0.5)', 'rgba(255,200,0,0.5)', 'rgba(80,200,80,0.5)'].map((c, i) => (
           <div key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: c }} />
         ))}
         <span
           style={{
             fontFamily: 'monospace',
             fontSize: 9,
-            color: 'rgba(255,255,255,0.25)',
+            color: 'rgba(255,255,255,0.22)',
             marginLeft: 6,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
           }}
         >
-          To: {form.toEmail || 'recipient@email.com'} · {subject}
+          To: {form.toEmail || 'recipient@email.com'} · {su}
         </span>
       </div>
       <div
         style={{
           background: e.header,
-          padding: compact ? '18px 18px 14px' : '24px 26px 18px',
+          padding: compact ? '16px 18px 12px' : '22px 24px 16px',
           textAlign: 'center',
           borderBottom: `1px solid ${e.border}`,
         }}
       >
         <p
           style={{
-            margin: '0 0 6px',
+            margin: '0 0 5px',
             fontFamily: 'monospace',
             fontSize: 8,
             letterSpacing: 4,
@@ -400,19 +388,19 @@ export function EmailPreview({ templateId, form, compact }) {
         <p
           style={{
             margin: 0,
-            fontSize: compact ? 14 : 17,
+            fontSize: compact ? 14 : 16,
             fontWeight: 700,
             color: e.text,
             lineHeight: 1.3,
           }}
         >
-          {subject}
+          {su}
         </p>
       </div>
-      <div style={{ padding: pad }}>
+      <div style={{ padding: compact ? '14px 18px' : '20px 24px' }}>
         <p
           style={{
-            margin: '0 0 4px',
+            margin: '0 0 3px',
             fontSize: 8,
             letterSpacing: 2,
             textTransform: 'uppercase',
@@ -425,7 +413,7 @@ export function EmailPreview({ templateId, form, compact }) {
         <div
           style={{
             margin: '10px 0',
-            padding: compact ? '12px 14px' : '16px 18px',
+            padding: compact ? '10px 14px' : '14px 16px',
             background: 'rgba(255,255,255,0.03)',
             borderLeft: `2px solid ${e.accent}`,
             borderRadius: '0 3px 3px 0',
@@ -433,24 +421,24 @@ export function EmailPreview({ templateId, form, compact }) {
         >
           <p
             style={{ margin: 0, fontSize: fs, lineHeight: 1.8, color: e.text }}
-            dangerouslySetInnerHTML={{ __html: msgHTML }}
+            dangerouslySetInnerHTML={{ __html: ht }}
           />
         </div>
         <p
           style={{
-            margin: '8px 0 0',
+            margin: '7px 0 0',
             fontSize: fs - 1,
             color: e.dim,
             textAlign: 'right',
             fontStyle: 'italic',
           }}
         >
-          — {from}
+          — {fr}
         </p>
       </div>
       <div
         style={{
-          padding: compact ? '8px 18px 14px' : '10px 26px 18px',
+          padding: compact ? '7px 18px 12px' : '8px 24px 14px',
           textAlign: 'center',
           borderTop: `1px solid ${e.border}`,
         }}
@@ -472,188 +460,243 @@ export function EmailPreview({ templateId, form, compact }) {
   )
 }
 
-// ── Helpers ───────────────────────────────────────────────────────
-function computeDeliveryDate(when, customDate) {
-  const now = new Date()
-  if (when.startsWith('custom')) {
-    if (!customDate) return null
-    const d = new Date(customDate)
-    return isNaN(d) ? null : d
-  }
-  const days = {
-    '1w': 7,
-    '1m': 30,
-    '3m': 90,
-    '6m': 180,
-    '1y': 365,
-    '2y': 730,
-    '3y': 1095,
-    '5y': 1825,
-    '10y': 3650,
-    '25y': 9125,
-    '30y': 10950,
-    '50y': 18250,
-  }[when]
-  return days ? new Date(now.getTime() + days * 86400000) : null
-}
-
-function getCustomMax(when, plan) {
-  if (when === 'custom-6m') return new Date(Date.now() + 180 * 86400000).toISOString().split('T')[0]
-  if (when === 'custom-3y')
-    return new Date(Date.now() + 1095 * 86400000).toISOString().split('T')[0]
-  return undefined
+// ── Step Bar ──────────────────────────────────────────────────────
+const STEP_LABELS = ['Template', 'Write', 'Confirm']
+function StepBar({ step }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', maxWidth: 380, margin: '0 auto 2rem' }}>
+      {STEP_LABELS.map((label, i) => {
+        const n = i + 1
+        const state = n < step ? 'done' : n === step ? 'active' : 'todo'
+        return (
+          <div
+            key={label}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              flex: i < STEP_LABELS.length - 1 ? 1 : undefined,
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+              <div
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontFamily: 'monospace',
+                  fontSize: '0.65rem',
+                  fontWeight: 700,
+                  flexShrink: 0,
+                  transition: 'all 0.3s',
+                  background:
+                    state === 'active'
+                      ? 'var(--amb)'
+                      : state === 'done'
+                        ? 'rgba(232,168,76,0.15)'
+                        : 'rgba(255,255,255,0.05)',
+                  color:
+                    state === 'active'
+                      ? 'var(--ink)'
+                      : state === 'done'
+                        ? 'var(--amb)'
+                        : 'rgba(200,184,152,0.3)',
+                  border: state === 'done' ? '1px solid rgba(232,168,76,0.4)' : 'none',
+                }}
+              >
+                {state === 'done' ? '✓' : n}
+              </div>
+              <span
+                style={{
+                  fontFamily: 'monospace',
+                  fontSize: '0.58rem',
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                  color: state === 'active' ? 'var(--amb)' : 'rgba(200,184,152,0.3)',
+                }}
+              >
+                {label}
+              </span>
+            </div>
+            {i < STEP_LABELS.length - 1 && (
+              <div
+                style={{
+                  flex: 1,
+                  height: 1,
+                  background: step > n ? 'rgba(232,168,76,0.3)' : 'rgba(232,168,76,0.1)',
+                  margin: '0 6px',
+                  marginBottom: 20,
+                }}
+              />
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
 }
 
 // ── Styles ────────────────────────────────────────────────────────
-const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:wght@400;500&family=JetBrains+Mono:wght@300;400&display=swap');
-  *{margin:0;padding:0;box-sizing:border-box;}
-  :root{--midnight:#080c14;--cosmos:#0d1525;--amber:#e8a84c;--gold:#f5c842;--parchment:#f2e8d5;--parchment-dim:#c8b898;--ink:#1a1005;}
-  body{font-family:'Lora',serif;background:var(--midnight);color:var(--parchment);min-height:100vh;}
+const S = `
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:wght@400;500&family=JetBrains+Mono:wght@300;400&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--midnight:#080c14;--cosmos:#0d1525;--amb:#e8a84c;--gold:#f5c842;--parch:#f2e8d5;--dim:#c8b898;--ink:#1a1005;}
+body{font-family:'Lora',serif;background:var(--midnight);color:var(--parch);min-height:100vh;}
 
-  /* NAV */
-  nav{padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(232,168,76,0.1);background:rgba(8,12,20,0.96);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
-  .logo{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--amber);text-decoration:none;}
-  .logo em{font-style:italic;color:var(--gold);}
-  .nav-r{display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;}
-  .nav-counter{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--parchment-dim);background:rgba(232,168,76,0.06);border:1px solid rgba(232,168,76,0.12);padding:0.28rem 0.65rem;border-radius:2px;white-space:nowrap;}
-  .nav-counter strong{color:var(--amber);}
-  .nav-link{font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.06em;color:var(--parchment-dim);text-decoration:none;transition:color 0.2s;white-space:nowrap;}
-  .nav-link:hover{color:var(--amber);}
+nav{padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(232,168,76,0.1);background:rgba(8,12,20,0.96);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
+.logo{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--amb);text-decoration:none;}
+.logo em{font-style:italic;color:var(--gold);}
+.nav-r{display:flex;align-items:center;gap:0.75rem;}
+.nav-pill{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--dim);background:rgba(232,168,76,0.06);border:1px solid rgba(232,168,76,0.12);padding:0.28rem 0.65rem;border-radius:2px;white-space:nowrap;}
+.nav-pill strong{color:var(--amb);}
+.nav-link{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--dim);text-decoration:none;transition:color 0.2s;}
+.nav-link:hover{color:var(--amb);}
 
-  /* STEP INDICATOR */
-  .steps{display:flex;align-items:center;gap:0;max-width:340px;margin:0 auto 2rem;}
-  .step{display:flex;align-items:center;gap:0.5rem;flex:1;}
-  .step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:0.65rem;font-weight:700;flex-shrink:0;transition:all 0.3s;}
-  .step-dot.active{background:var(--amber);color:var(--ink);}
-  .step-dot.done{background:rgba(232,168,76,0.2);color:var(--amber);border:1px solid rgba(232,168,76,0.4);}
-  .step-dot.inactive{background:rgba(255,255,255,0.05);color:rgba(200,184,152,0.3);border:1px solid rgba(255,255,255,0.08);}
-  .step-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
-  .step-label.active{color:var(--amber);}
-  .step-label.inactive{color:rgba(200,184,152,0.3);}
-  .step-connector{flex:1;height:1px;background:rgba(232,168,76,0.15);margin:0 0.5rem;}
+.page{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--amb);margin-bottom:0.5rem;}
+.heading{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--parch);margin-bottom:0.4rem;line-height:1.2;}
+.heading em{font-style:italic;color:var(--amb);}
+.subhead{color:var(--dim);font-size:0.85rem;font-style:italic;margin-bottom:2rem;}
 
-  /* PAGE */
-  .page{max-width:1200px;margin:0 auto;padding:2rem 1.5rem;}
-  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--amber);margin-bottom:0.5rem;}
-  .heading{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--parchment);margin-bottom:0.4rem;line-height:1.2;}
-  .heading em{font-style:italic;color:var(--amber);}
-  .subhead{color:var(--parchment-dim);font-size:0.85rem;font-style:italic;margin-bottom:2rem;}
+/* ── STEP 1: template grid ── */
+.tgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:0.65rem;margin-bottom:2.5rem;}
+@media(max-width:1100px){.tgrid{grid-template-columns:repeat(5,1fr);}}
+@media(max-width:860px){.tgrid{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:620px){.tgrid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:400px){.tgrid{grid-template-columns:repeat(2,1fr);}}
 
-  /* TEMPLATE GRID */
-  .tmpl-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:0.65rem;margin-bottom:2.5rem;}
-  @media(max-width:1100px){.tmpl-grid{grid-template-columns:repeat(5,1fr);}}
-  @media(max-width:860px){.tmpl-grid{grid-template-columns:repeat(4,1fr);}}
-  @media(max-width:640px){.tmpl-grid{grid-template-columns:repeat(3,1fr);}}
-  @media(max-width:420px){.tmpl-grid{grid-template-columns:repeat(2,1fr);}}
+.tc{border-radius:6px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.2s;position:relative;}
+.tc:hover:not(.tc-lk){transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.4);}
+.tc.sel{border-color:var(--amb);box-shadow:0 0 0 3px rgba(232,168,76,0.2);}
+.tc-prev{height:58px;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px;}
+.tc-bar{height:3px;border-radius:2px;}
+.tc-line{height:2px;border-radius:1px;opacity:0.32;}
+.tc-meta{padding:7px 9px 9px;}
+.tc-sc{font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:rgba(255,255,255,0.35);margin-bottom:2px;}
+.tc-nm{font-family:'Playfair Display',serif;font-size:0.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tc-ds{font-family:'JetBrains Mono',monospace;font-size:0.48rem;color:rgba(255,255,255,0.25);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tc-lock{position:absolute;inset:0;background:rgba(8,12,20,0.72);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;backdrop-filter:blur(1px);}
+.tc-lk-ico{font-size:0.9rem;}
+.tc-lk-badge{font-family:'JetBrains Mono',monospace;font-size:0.46rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--amb);background:rgba(232,168,76,0.1);border:1px solid rgba(232,168,76,0.26);padding:2px 7px;border-radius:2px;}
 
-  .tc{border-radius:6px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.2s;position:relative;}
-  .tc:hover:not(.tc-locked){transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.4);}
-  .tc.selected{border-color:var(--amber);box-shadow:0 0 0 3px rgba(232,168,76,0.2);}
-  .tc-preview{height:60px;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px;}
-  .tc-bar{height:3px;border-radius:2px;}
-  .tc-line{height:2px;border-radius:1px;opacity:0.35;}
-  .tc-meta{padding:7px 9px 9px;}
-  .tc-scenario{font-family:'JetBrains Mono',monospace;font-size:0.5rem;letter-spacing:0.06em;color:rgba(255,255,255,0.38);margin-bottom:2px;}
-  .tc-name{font-family:'Playfair Display',serif;font-size:0.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .tc-desc{font-family:'JetBrains Mono',monospace;font-size:0.48rem;color:rgba(255,255,255,0.28);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .tc-lock{position:absolute;inset:0;background:rgba(8,12,20,0.7);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;backdrop-filter:blur(1px);}
-  .tc-lock-icon{font-size:0.9rem;}
-  .tc-lock-badge{font-family:'JetBrains Mono',monospace;font-size:0.46rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--amber);background:rgba(232,168,76,0.1);border:1px solid rgba(232,168,76,0.28);padding:2px 7px;border-radius:2px;}
+/* ── Step 1 continue btn ── */
+.cont-wrap{text-align:center;}
+.cont-btn{display:inline-flex;align-items:center;justify-content:center;gap:0.75rem;background:var(--amb);color:var(--ink);border:none;padding:0.95rem 2.5rem;font-family:'Lora',serif;font-size:1rem;cursor:pointer;border-radius:2px;transition:all 0.2s;}
+.cont-btn:hover{background:var(--gold);}
+.cont-note{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:rgba(200,184,152,0.32);margin-top:0.6rem;letter-spacing:0.06em;}
 
-  /* STEP 1 NEXT BUTTON */
-  .next-btn{display:flex;align-items:center;justify-content:center;gap:0.75rem;background:var(--amber);color:var(--ink);border:none;padding:0.95rem 2.5rem;font-family:'Lora',serif;font-size:1rem;cursor:pointer;border-radius:2px;transition:all 0.2s;margin:0 auto;}
-  .next-btn:hover{background:var(--gold);}
-  .next-btn-wrap{text-align:center;}
-  .next-note{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:rgba(200,184,152,0.35);margin-top:0.6rem;letter-spacing:0.06em;}
+/* ── Step 2: 2-col grid ── */
+.s2grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:start;}
+@media(max-width:860px){.s2grid{grid-template-columns:1fr;}}
+.sticky{position:sticky;top:80px;}
+.prev-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--amb);margin-bottom:0.6rem;}
+.prev-note{font-family:'JetBrains Mono',monospace;font-size:0.52rem;color:rgba(200,184,152,0.25);text-align:center;margin-top:0.5rem;letter-spacing:0.08em;text-transform:uppercase;}
 
-  /* STEP 2 LAYOUT */
-  .step2-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:start;}
-  @media(max-width:860px){.step2-grid{grid-template-columns:1fr;}}
-  .preview-sticky{position:sticky;top:80px;}
-  .preview-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--amber);margin-bottom:0.6rem;}
-  .preview-note{font-family:'JetBrains Mono',monospace;font-size:0.54rem;color:rgba(200,184,152,0.28);text-align:center;margin-top:0.5rem;letter-spacing:0.08em;text-transform:uppercase;}
+/* ── Form elements ── */
+.fg{margin-bottom:1rem;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;margin-bottom:1rem;}
+@media(max-width:560px){.frow{grid-template-columns:1fr;}}
+.fl{display:block;font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--amb);margin-bottom:0.4rem;}
+.fl span{color:var(--dim);text-transform:none;letter-spacing:0;font-size:0.58rem;}
+.fi,.ft,.fs{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(232,168,76,0.14);border-radius:2px;padding:0.75rem 0.9rem;color:var(--parch);font-family:'Lora',serif;font-size:0.9rem;outline:none;transition:border-color 0.2s;}
+.fi:focus,.ft:focus,.fs:focus{border-color:var(--amb);background:rgba(232,168,76,0.03);}
+.fi::placeholder,.ft::placeholder{color:rgba(200,184,152,0.28);font-style:italic;}
+.ft{resize:vertical;min-height:170px;line-height:1.8;}
+.fs{cursor:pointer;}
+input[type="date"].fi{color-scheme:dark;cursor:pointer;}
+input[type="date"].fi::-webkit-calendar-picker-indicator{filter:invert(0.7) sepia(1) saturate(3) hue-rotate(5deg);cursor:pointer;}
+.cc{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--dim);text-align:right;margin-top:0.25rem;}
 
-  /* FORM */
-  .form-group{margin-bottom:1rem;}
-  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;margin-bottom:1rem;}
-  @media(max-width:580px){.form-row{grid-template-columns:1fr;}}
-  .fl{display:block;font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--amber);margin-bottom:0.4rem;}
-  .fl span{color:var(--parchment-dim);text-transform:none;letter-spacing:0;font-size:0.58rem;}
-  .fi,.fta,.fs{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(232,168,76,0.14);border-radius:2px;padding:0.75rem 0.9rem;color:var(--parchment);font-family:'Lora',serif;font-size:0.9rem;outline:none;transition:border-color 0.2s;}
-  .fi:focus,.fta:focus,.fs:focus{border-color:var(--amber);background:rgba(232,168,76,0.03);}
-  .fi::placeholder,.fta::placeholder{color:rgba(200,184,152,0.28);font-style:italic;}
-  .fta{resize:vertical;min-height:170px;line-height:1.8;}
-  .fs{cursor:pointer;}
-  input[type="date"].fi{color-scheme:dark;cursor:pointer;}
-  input[type="date"].fi::-webkit-calendar-picker-indicator{filter:invert(0.7) sepia(1) saturate(3) hue-rotate(5deg);cursor:pointer;}
-  .char-count{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--parchment-dim);text-align:right;margin-top:0.25rem;}
+.deli-hint{background:rgba(232,168,76,0.05);border:1px solid rgba(232,168,76,0.12);border-radius:2px;padding:0.65rem 0.85rem;margin-bottom:1rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--dim);}
+.deli-hint strong{color:var(--amb);}
 
-  .delivery-hint{background:rgba(232,168,76,0.05);border:1px solid rgba(232,168,76,0.12);border-radius:2px;padding:0.7rem 0.9rem;margin-bottom:1rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--parchment-dim);letter-spacing:0.03em;}
-  .delivery-hint strong{color:var(--amber);}
+/* ── Step 2 → 3 btn ── */
+.review-btn{width:100%;background:var(--amb);color:var(--ink);border:none;padding:0.95rem;font-family:'Lora',serif;font-size:0.95rem;cursor:pointer;border-radius:2px;transition:all 0.2s;margin-top:0.5rem;}
+.review-btn:hover{background:var(--gold);}
+.review-btn:disabled{opacity:0.5;cursor:not-allowed;}
 
-  .submit-btn{width:100%;background:var(--amber);color:var(--ink);border:none;padding:0.95rem;font-family:'Lora',serif;font-size:0.95rem;cursor:pointer;border-radius:2px;transition:all 0.2s;margin-top:0.5rem;}
-  .submit-btn:hover{background:var(--gold);}
-  .submit-btn:disabled{opacity:0.6;cursor:not-allowed;}
-  .submit-note{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:rgba(200,184,152,0.32);text-align:center;margin-top:0.5rem;letter-spacing:0.04em;}
+/* ── Step 3: confirm ── */
+.confirm-wrap{max-width:680px;margin:0 auto;}
+.confirm-meta{background:rgba(255,255,255,0.02);border:1px solid rgba(232,168,76,0.12);border-radius:4px;padding:1.5rem;margin-bottom:1.75rem;}
+.cm-row{display:flex;gap:0.75rem;padding:0.55rem 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.cm-row:last-child{border-bottom:none;}
+.cm-key{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--amb);min-width:90px;flex-shrink:0;padding-top:2px;}
+.cm-val{font-size:0.9rem;color:var(--parch);line-height:1.5;word-break:break-word;}
+.cm-msg{font-style:italic;color:var(--dim);font-size:0.88rem;line-height:1.7;max-height:140px;overflow-y:auto;}
 
-  .back-link{display:inline-flex;align-items:center;gap:0.4rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.08em;color:var(--parchment-dim);cursor:pointer;background:none;border:none;padding:0;margin-bottom:1.5rem;transition:color 0.2s;}
-  .back-link:hover{color:var(--amber);}
+.confirm-preview{margin-bottom:1.75rem;}
+.confirm-actions{display:flex;gap:0.85rem;flex-wrap:wrap;}
+.seal-btn{flex:1;background:var(--amb);color:var(--ink);border:none;padding:1rem;font-family:'Lora',serif;font-size:1rem;cursor:pointer;border-radius:2px;transition:all 0.2s;min-width:180px;}
+.seal-btn:hover{background:var(--gold);}
+.seal-btn:disabled{opacity:0.6;cursor:not-allowed;}
 
-  .warn{background:rgba(232,168,76,0.06);border:1px solid rgba(232,168,76,0.2);border-radius:3px;padding:0.75rem 0.9rem;margin-bottom:1.25rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--amber);letter-spacing:0.03em;}
-  .divider{height:1px;background:linear-gradient(to right,transparent,rgba(232,168,76,0.12),transparent);margin:2rem 0;}
+/* ── Nav chip / back ── */
+.back-btn{display:inline-flex;align-items:center;gap:0.4rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--dim);cursor:pointer;background:none;border:none;padding:0;margin-bottom:1.5rem;transition:color 0.2s;}
+.back-btn:hover{color:var(--amb);}
+.tmpl-chip{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(232,168,76,0.07);border:1px solid rgba(232,168,76,0.18);border-radius:3px;padding:0.38rem 0.75rem;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--amb);margin-bottom:1.25rem;cursor:pointer;transition:all 0.2s;}
+.tmpl-chip:hover{border-color:var(--amb);}
+.tmpl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
 
-  /* SELECTED TEMPLATE CHIP */
-  .tmpl-chip{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.2);border-radius:3px;padding:0.4rem 0.8rem;font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--amber);margin-bottom:1.25rem;cursor:pointer;transition:all 0.2s;}
-  .tmpl-chip:hover{border-color:var(--amber);}
-  .tmpl-chip-dot{width:10px;height:10px;border-radius:50%;}
+/* ── Warnings ── */
+.warn{background:rgba(232,168,76,0.06);border:1px solid rgba(232,168,76,0.2);border-radius:3px;padding:0.7rem 0.9rem;margin-bottom:1.25rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--amb);}
+.divider{height:1px;background:linear-gradient(to right,transparent,rgba(232,168,76,0.12),transparent);margin:2rem 0;}
 
-  /* LOCK MODAL */
-  .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:200;display:flex;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(4px);animation:fadeIn 0.2s;}
-  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-  .modal{background:var(--cosmos);border:1px solid rgba(232,168,76,0.2);border-radius:6px;padding:2rem;max-width:520px;width:100%;animation:slideUp 0.2s;max-height:90vh;overflow-y:auto;}
-  @keyframes slideUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
-  .modal-eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--amber);margin-bottom:0.5rem;}
-  .modal-title{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--parchment);margin-bottom:0.5rem;}
-  .modal-desc{color:var(--parchment-dim);font-size:0.85rem;font-style:italic;line-height:1.7;margin-bottom:1.25rem;}
-  .modal-preview{border-radius:4px;overflow:hidden;margin-bottom:1.5rem;}
-  .price-row{display:flex;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap;}
-  .price-pill{flex:1;min-width:130px;background:rgba(232,168,76,0.05);border:1px solid rgba(232,168,76,0.18);border-radius:4px;padding:0.85rem;text-align:center;}
-  .price-amount{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--amber);}
-  .price-pill-label{font-family:'JetBrains Mono',monospace;font-size:0.57rem;color:var(--parchment-dim);letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;}
-  .price-pill-note{font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:rgba(200,184,152,0.38);margin-top:3px;}
-  .modal-btns{display:flex;gap:0.65rem;}
-  .btn-p{flex:1;background:var(--amber);color:var(--ink);border:none;padding:0.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;}
-  .btn-p:hover{background:var(--gold);}
-  .btn-g{background:transparent;color:var(--parchment-dim);border:1px solid rgba(232,168,76,0.18);padding:0.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;}
-  .btn-g:hover{border-color:var(--amber);color:var(--amber);}
+/* ── Lock modal ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:200;display:flex;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(4px);animation:fadeIn 0.2s;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--cosmos);border:1px solid rgba(232,168,76,0.2);border-radius:6px;padding:2rem;max-width:500px;width:100%;animation:slideUp 0.2s;max-height:88vh;overflow-y:auto;}
+@keyframes slideUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+.m-ey{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--amb);margin-bottom:0.5rem;}
+.m-ti{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--parch);margin-bottom:0.5rem;}
+.m-de{color:var(--dim);font-size:0.85rem;font-style:italic;line-height:1.7;margin-bottom:1.25rem;}
+.m-prev{border-radius:4px;overflow:hidden;margin-bottom:1.4rem;}
+.pr-row{display:flex;gap:0.75rem;margin-bottom:1.4rem;flex-wrap:wrap;}
+.pr-pill{flex:1;min-width:120px;background:rgba(232,168,76,0.05);border:1px solid rgba(232,168,76,0.18);border-radius:4px;padding:0.85rem;text-align:center;}
+.pr-amt{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--amb);}
+.pr-lbl{font-family:'JetBrains Mono',monospace;font-size:0.55rem;color:var(--dim);letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;}
+.pr-nt{font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:rgba(200,184,152,0.35);margin-top:3px;}
+.m-btns{display:flex;gap:0.6rem;}
+.btn-p{flex:1;background:var(--amb);color:var(--ink);border:none;padding:0.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;}
+.btn-p:hover{background:var(--gold);}
+.btn-g{background:transparent;color:var(--dim);border:1px solid rgba(232,168,76,0.18);padding:0.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;}
+.btn-g:hover{border-color:var(--amb);color:var(--amb);}
 
-  /* SUCCESS */
-  .success-wrap{min-height:70vh;display:flex;align-items:center;justify-content:center;padding:2rem;}
-  .success-card{text-align:center;max-width:480px;width:100%;}
-  .success-icon{font-size:3rem;display:block;margin-bottom:1.25rem;animation:float 4s ease-in-out infinite;}
-  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-  .success-title{font-family:'Playfair Display',serif;font-size:1.9rem;color:var(--parchment);margin-bottom:0.65rem;}
-  .success-title em{color:var(--amber);font-style:italic;}
-  .success-desc{color:var(--parchment-dim);line-height:1.8;margin-bottom:2rem;font-style:italic;font-size:0.9rem;}
-  .success-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+/* ── Success ── */
+.succ-wrap{min-height:70vh;display:flex;align-items:center;justify-content:center;padding:2rem;}
+.succ-card{text-align:center;max-width:460px;width:100%;}
+.succ-ico{font-size:3rem;display:block;margin-bottom:1.25rem;animation:float 4s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.succ-title{font-family:'Playfair Display',serif;font-size:1.9rem;color:var(--parch);margin-bottom:0.65rem;}
+.succ-title em{color:var(--amb);font-style:italic;}
+.succ-desc{color:var(--dim);line-height:1.8;margin-bottom:2rem;font-style:italic;font-size:0.9rem;}
+.succ-acts{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
 
-  /* LOADING */
-  .center-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;}
-  .loading-text{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--amber);letter-spacing:0.2em;animation:pulse 1.5s ease-in-out infinite;}
-  @keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
+/* ── Loading ── */
+.cscreen{min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.ld{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--amb);letter-spacing:0.2em;animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--cosmos);border:1px solid rgba(232,168,76,0.3);border-radius:4px;padding:0.85rem 1.25rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--parch);z-index:999;animation:slideUp 0.3s ease;max-width:300px;}
+.toast-err{border-color:rgba(232,124,124,0.4);color:#e87c7c;}
 
-  .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--cosmos);border:1px solid rgba(232,168,76,0.3);border-radius:4px;padding:0.85rem 1.25rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--parchment);z-index:999;animation:toastIn 0.3s ease;max-width:300px;}
-  .toast-error{border-color:rgba(232,124,124,0.4);color:#e87c7c;}
-  @keyframes toastIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+/* ── Responsive ── */
+@media(max-width:720px){
+  nav{padding:0.85rem 1.1rem;}
+  .page{padding:1.5rem 1rem;}
+  .heading{font-size:1.5rem;}
+  .confirm-actions{flex-direction:column;}
+  .seal-btn{min-width:unset;}
+}
 `
 
+// ── Main Component ────────────────────────────────────────────────
 export default function WriteCapsule() {
-  const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [capsuleCount, setCapsuleCount] = useState(0)
   const [step, setStep] = useState(1)
-  const [selectedTemplate, setSelectedTemplate] = useState('cosmic')
+  const [selectedTemplate, setTemplate] = useState('cosmic')
   const [lockedModal, setLockedModal] = useState(null)
   const [form, setForm] = useState({
     to: '',
@@ -667,7 +710,6 @@ export default function WriteCapsule() {
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(null)
   const [toast, setToast] = useState(null)
-  const plan = 'free' // future: from user metadata
 
   const supabase = createClient()
 
@@ -680,7 +722,6 @@ export default function WriteCapsule() {
         window.location.href = '/login'
         return
       }
-      setUser(user)
       const res = await fetch('/api/capsules')
       const data = await res.json()
       if (data.capsules) setCapsuleCount(data.capsules.length)
@@ -696,30 +737,20 @@ export default function WriteCapsule() {
 
   const sf = k => e => setForm(f => ({ ...f, [k]: e.target.value }))
   const tmpl = TEMPLATES.find(t => t.id === selectedTemplate) || TEMPLATES[0]
-  const deliverAt = computeDeliveryDate(form.when, form.customDate)
-  const daysUntil = deliverAt ? Math.ceil((deliverAt - new Date()) / 86400000) : null
+  const delAt = computeDelivery(form.when, form.customDate)
+  const days = delAt ? Math.ceil((delAt - Date.now()) / 86400000) : null
   const atLimit = capsuleCount >= FREE_LIMIT
   const remaining = FREE_LIMIT - capsuleCount
-  const isCustomDate = form.when.startsWith('custom')
-  const customMax = getCustomMax(form.when, plan)
+  const isCustom = form.when.startsWith('custom')
+  const canReview = !!(
+    form.to &&
+    form.toEmail &&
+    form.message &&
+    form.when &&
+    (!isCustom || form.customDate)
+  )
 
   const handleSubmit = async () => {
-    if (!form.to || !form.toEmail || !form.message) {
-      showToast('Fill in recipient, email, and message.', true)
-      return
-    }
-    if (!form.when) {
-      showToast('Choose a delivery time.', true)
-      return
-    }
-    if (isCustomDate && !form.customDate) {
-      showToast('Pick a delivery date.', true)
-      return
-    }
-    if (atLimit) {
-      showToast("You've reached your 10 capsule limit.", true)
-      return
-    }
     setSubmitting(true)
     try {
       const res = await fetch('/api/capsules', {
@@ -740,61 +771,53 @@ export default function WriteCapsule() {
     }
   }
 
+  const resetAll = () => {
+    setForm({ to: '', toEmail: '', from: '', subject: '', message: '', when: '', customDate: '' })
+    setSuccess(null)
+    setStep(1)
+    setCapsuleCount(c => c + 1)
+  }
+
+  // ── Loading ───────────────────────────────────────────────────
   if (loading)
     return (
       <>
-        <style>{styles}</style>
-        <div className="center-screen">
-          <p className="loading-text">✦ &nbsp; opening vault &nbsp; ✦</p>
+        <style>{S}</style>
+        <div className="cscreen">
+          <p className="ld">✦ &nbsp; opening vault &nbsp; ✦</p>
         </div>
       </>
     )
 
-  if (success) {
-    const dateStr = new Date(success.deliverAt).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
+  // ── Success ───────────────────────────────────────────────────
+  if (success)
     return (
       <>
-        <style>{styles}</style>
+        <style>{S}</style>
         <nav>
           <a className="logo" href="/dashboard">
             Time<em>Capsula</em>
           </a>
         </nav>
-        <div className="success-wrap">
-          <div className="success-card">
-            <span className="success-icon">📬</span>
-            <h2 className="success-title">
+        <div className="succ-wrap">
+          <div className="succ-card">
+            <span className="succ-ico">📬</span>
+            <h2 className="succ-title">
               Capsule <em>sealed.</em>
             </h2>
-            <p className="success-desc">
-              Your message to <strong style={{ color: 'var(--amber)' }}>{success.to}</strong> is
+            <p className="succ-desc">
+              Your message to <strong style={{ color: 'var(--amb)' }}>{success.to}</strong> is
               locked in time.
               <br />
               <br />
-              It delivers on <strong style={{ color: 'var(--amber)' }}>{dateStr}</strong>.
+              Delivers on{' '}
+              <strong style={{ color: 'var(--amb)' }}>
+                {fmtDate(new Date(success.deliverAt))}
+              </strong>
+              .
             </p>
-            <div className="success-actions">
-              <button
-                className="btn-p"
-                onClick={() => {
-                  setForm({
-                    to: '',
-                    toEmail: '',
-                    from: '',
-                    subject: '',
-                    message: '',
-                    when: '',
-                    customDate: '',
-                  })
-                  setSuccess(null)
-                  setStep(1)
-                  setCapsuleCount(c => c + 1)
-                }}
-              >
+            <div className="succ-acts">
+              <button className="btn-p" onClick={resetAll}>
                 ✦ Write Another
               </button>
               <a href="/dashboard" className="btn-g">
@@ -805,12 +828,12 @@ export default function WriteCapsule() {
         </div>
       </>
     )
-  }
 
+  // ── Main render ───────────────────────────────────────────────
   return (
     <>
-      <style>{styles}</style>
-      {toast && <div className={`toast ${toast.isError ? 'toast-error' : ''}`}>{toast.msg}</div>}
+      <style>{S}</style>
+      {toast && <div className={`toast ${toast.isError ? 'toast-err' : ''}`}>{toast.msg}</div>}
 
       {/* Lock modal */}
       {lockedModal && (
@@ -819,10 +842,10 @@ export default function WriteCapsule() {
           onClick={e => e.target === e.currentTarget && setLockedModal(null)}
         >
           <div className="modal">
-            <p className="modal-eyebrow">{lockedModal.scenario}</p>
-            <h2 className="modal-title">{lockedModal.name}</h2>
-            <p className="modal-desc">{lockedModal.desc}</p>
-            <div className="modal-preview">
+            <p className="m-ey">{lockedModal.scenario}</p>
+            <h2 className="m-ti">{lockedModal.name}</h2>
+            <p className="m-de">{lockedModal.desc}</p>
+            <div className="m-prev">
               <EmailPreview
                 templateId={lockedModal.id}
                 form={{
@@ -835,19 +858,19 @@ export default function WriteCapsule() {
                 compact
               />
             </div>
-            <div className="price-row">
-              <div className="price-pill">
-                <div className="price-amount">$5</div>
-                <div className="price-pill-label">Lifetime access</div>
-                <div className="price-pill-note">Use unlimited times</div>
+            <div className="pr-row">
+              <div className="pr-pill">
+                <div className="pr-amt">$5</div>
+                <div className="pr-lbl">Lifetime access</div>
+                <div className="pr-nt">Use unlimited times</div>
               </div>
-              <div className="price-pill">
-                <div className="price-amount">$1</div>
-                <div className="price-pill-label">5 uses pack</div>
-                <div className="price-pill-note">Perfect for one story</div>
+              <div className="pr-pill">
+                <div className="pr-amt">$1</div>
+                <div className="pr-lbl">5 uses pack</div>
+                <div className="pr-nt">Perfect for one story</div>
               </div>
             </div>
-            <div className="modal-btns">
+            <div className="m-btns">
               <button
                 className="btn-p"
                 onClick={() => {
@@ -870,7 +893,7 @@ export default function WriteCapsule() {
           Time<em>Capsula</em>
         </a>
         <div className="nav-r">
-          <span className="nav-counter">
+          <span className="nav-pill">
             <strong>{capsuleCount}</strong> / {FREE_LIMIT} used
           </span>
           <a href="/dashboard" className="nav-link">
@@ -880,20 +903,7 @@ export default function WriteCapsule() {
       </nav>
 
       <div className="page">
-        {/* Step indicator */}
-        <div className="steps">
-          <div className="step">
-            <div className={`step-dot ${step === 1 ? 'active' : 'done'}`}>
-              {step > 1 ? '✓' : '1'}
-            </div>
-            <span className={`step-label ${step === 1 ? 'active' : 'inactive'}`}>Template</span>
-          </div>
-          <div className="step-connector" />
-          <div className="step">
-            <div className={`step-dot ${step === 2 ? 'active' : 'inactive'}`}>2</div>
-            <span className={`step-label ${step === 2 ? 'active' : 'inactive'}`}>Write & Send</span>
-          </div>
-        </div>
+        <StepBar step={step} />
 
         {atLimit && (
           <div className="warn">
@@ -902,49 +912,51 @@ export default function WriteCapsule() {
         )}
         {!atLimit && remaining <= 3 && (
           <div className="warn">
-            ✦ {remaining} free capsule{remaining !== 1 ? 's' : ''} remaining.
+            ✦ {remaining} capsule{remaining !== 1 ? 's' : ''} remaining on free plan.
           </div>
         )}
 
-        {/* ── STEP 1: Template picker ── */}
+        {/* ══════════════════════════════════════════════════════
+            STEP 1 — Pick template
+        ══════════════════════════════════════════════════════ */}
         {step === 1 && (
           <>
-            <p className="eyebrow">Step 1 of 2</p>
+            <p className="eyebrow">Step 1 of 3</p>
             <h1 className="heading">
               Choose your <em>template.</em>
             </h1>
             <p className="subhead">
-              Click any locked template to preview it. Your details are saved when you go back.
+              Locked templates are fully visible — click to preview before unlocking.
             </p>
 
-            <div className="tmpl-grid">
+            <div className="tgrid">
               {TEMPLATES.map(t => {
                 const locked = !FREE_IDS.includes(t.id)
                 const selected = selectedTemplate === t.id
                 return (
                   <div
                     key={t.id}
-                    className={`tc ${selected ? 'selected' : ''} ${locked ? 'tc-locked' : ''}`}
+                    className={`tc ${selected ? 'sel' : ''} ${locked ? 'tc-lk' : ''}`}
                     style={{ background: t.card.bg }}
-                    onClick={() => (locked ? setLockedModal(t) : setSelectedTemplate(t.id))}
+                    onClick={() => (locked ? setLockedModal(t) : setTemplate(t.id))}
                   >
-                    <div className="tc-preview" style={{ background: t.card.bg }}>
+                    <div className="tc-prev" style={{ background: t.card.bg }}>
                       <div className="tc-bar" style={{ background: t.card.accent, width: '55%' }} />
                       <div className="tc-line" style={{ background: t.card.text, width: '80%' }} />
                       <div className="tc-line" style={{ background: t.card.text, width: '60%' }} />
                       <div className="tc-line" style={{ background: t.card.text, width: '72%' }} />
                     </div>
                     <div className="tc-meta" style={{ background: `${t.card.bg}ee` }}>
-                      <div className="tc-scenario">{t.scenario}</div>
-                      <div className="tc-name" style={{ color: t.card.text }}>
+                      <div className="tc-sc">{t.scenario}</div>
+                      <div className="tc-nm" style={{ color: t.card.text }}>
                         {t.name}
                       </div>
-                      <div className="tc-desc">{t.desc}</div>
+                      <div className="tc-ds">{t.desc}</div>
                     </div>
                     {locked && (
                       <div className="tc-lock">
-                        <span className="tc-lock-icon">🔒</span>
-                        <span className="tc-lock-badge">$5 lifetime</span>
+                        <span className="tc-lk-ico">🔒</span>
+                        <span className="tc-lk-badge">$5 lifetime</span>
                       </div>
                     )}
                   </div>
@@ -952,41 +964,41 @@ export default function WriteCapsule() {
               })}
             </div>
 
-            <div className="next-btn-wrap">
-              <button className="next-btn" onClick={() => setStep(2)}>
+            <div className="cont-wrap">
+              <button className="cont-btn" onClick={() => setStep(2)}>
                 Continue with {tmpl.name} →
               </button>
-              <p className="next-note">
+              <p className="cont-note">
                 {tmpl.scenario} · {tmpl.desc}
               </p>
             </div>
           </>
         )}
 
-        {/* ── STEP 2: Write + Preview ── */}
+        {/* ══════════════════════════════════════════════════════
+            STEP 2 — Write details + live preview
+        ══════════════════════════════════════════════════════ */}
         {step === 2 && (
           <>
-            <button className="back-link" onClick={() => setStep(1)}>
+            <button className="back-btn" onClick={() => setStep(1)}>
               ← Back to templates
             </button>
-
-            {/* Selected template chip */}
-            <div className="tmpl-chip" onClick={() => setStep(1)} title="Click to change template">
-              <div className="tmpl-chip-dot" style={{ background: tmpl.card.accent }} />
-              {tmpl.scenario} {tmpl.name} · click to change
+            <div className="tmpl-chip" onClick={() => setStep(1)} title="Click to change">
+              <div className="tmpl-dot" style={{ background: tmpl.card.accent }} />
+              {tmpl.scenario} {tmpl.name} · change template
             </div>
 
-            <p className="eyebrow">Step 2 of 2</p>
+            <p className="eyebrow">Step 2 of 3</p>
             <h1 className="heading">
-              Write your <em>capsule.</em>
+              Write your <em>message.</em>
             </h1>
 
-            <div className="step2-grid">
-              {/* Form */}
+            <div className="s2grid">
+              {/* Left: form */}
               <div>
-                <div className="form-row">
+                <div className="frow">
                   <div>
-                    <label className="fl">To — recipient *</label>
+                    <label className="fl">To — recipient name *</label>
                     <input
                       className="fi"
                       type="text"
@@ -1007,7 +1019,7 @@ export default function WriteCapsule() {
                   </div>
                 </div>
 
-                <div className="form-row">
+                <div className="frow">
                   <div>
                     <label className="fl">
                       From — your name <span>(optional)</span>
@@ -1034,31 +1046,31 @@ export default function WriteCapsule() {
                   </div>
                 </div>
 
-                <div className="form-group">
+                <div className="fg">
                   <label className="fl">Your message *</label>
                   <textarea
-                    className="fta"
+                    className="ft"
                     placeholder={tmpl.placeholder}
                     value={form.message}
                     onChange={sf('message')}
                     maxLength={5000}
                   />
-                  <div className="char-count">{form.message.length} / 5000</div>
+                  <div className="cc">{form.message.length} / 5000</div>
                 </div>
 
-                <div className="form-row">
+                <div className="frow">
                   <div>
                     <label className="fl">Deliver in *</label>
                     <select className="fs" value={form.when} onChange={sf('when')}>
                       <option value="">Choose a time...</option>
-                      {DELIVERY_BY_PLAN[plan].map(o => (
+                      {DELIVERY_OPTIONS.map(o => (
                         <option key={o.value} value={o.value}>
                           {o.label}
                         </option>
                       ))}
                     </select>
                   </div>
-                  {isCustomDate && (
+                  {isCustom && (
                     <div>
                       <label className="fl">Delivery date *</label>
                       <input
@@ -1066,47 +1078,119 @@ export default function WriteCapsule() {
                         type="date"
                         value={form.customDate}
                         min={new Date(Date.now() + 86400000).toISOString().split('T')[0]}
-                        max={customMax}
+                        max={customMax(form.when)}
                         onChange={sf('customDate')}
                       />
                     </div>
                   )}
                 </div>
 
-                {daysUntil && (
-                  <div className="delivery-hint">
-                    ✦ Sealed for <strong>{daysUntil.toLocaleString()} days</strong> — delivers{' '}
-                    {deliverAt.toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
+                {days && (
+                  <div className="deli-hint">
+                    ✦ Sealed for <strong>{days.toLocaleString()} days</strong> — delivers{' '}
+                    {fmtDate(delAt)}
                   </div>
                 )}
 
                 <button
-                  className="submit-btn"
-                  onClick={handleSubmit}
-                  disabled={submitting || atLimit}
+                  className="review-btn"
+                  onClick={() => setStep(3)}
+                  disabled={!canReview || atLimit}
                 >
-                  {submitting ? '✦ Sealing...' : '✦ Seal & Send Into Time'}
+                  {atLimit
+                    ? '⚠ Capsule limit reached'
+                    : canReview
+                      ? 'Review & Confirm →'
+                      : 'Fill in all required fields to continue'}
                 </button>
-                <p className="submit-note">
-                  {capsuleCount} of {FREE_LIMIT} used ·{' '}
-                  <a href="/#pricing" style={{ color: 'var(--amber)' }}>
-                    Upgrade for unlimited
-                  </a>
-                </p>
               </div>
 
-              {/* Live preview */}
+              {/* Right: live preview */}
               <div>
-                <div className="preview-sticky">
-                  <p className="preview-label">✦ Live email preview</p>
+                <div className="sticky">
+                  <p className="prev-label">✦ Live preview — updates as you type</p>
                   <EmailPreview templateId={selectedTemplate} form={form} />
-                  <p className="preview-note">Exactly what arrives in the inbox</p>
+                  <p className="prev-note">Exactly what lands in the inbox</p>
                 </div>
               </div>
+            </div>
+          </>
+        )}
+
+        {/* ══════════════════════════════════════════════════════
+            STEP 3 — Confirm & seal
+        ══════════════════════════════════════════════════════ */}
+        {step === 3 && (
+          <>
+            <button className="back-btn" onClick={() => setStep(2)}>
+              ← Edit message
+            </button>
+
+            <p className="eyebrow">Step 3 of 3</p>
+            <h1 className="heading">
+              Confirm & <em>seal.</em>
+            </h1>
+            <p className="subhead">
+              Look it over one last time. Once sealed, it travels until the day arrives.
+            </p>
+
+            <div className="confirm-wrap">
+              {/* Meta summary */}
+              <div className="confirm-meta">
+                {[
+                  { key: 'Template', val: `${tmpl.scenario} ${tmpl.name}` },
+                  { key: 'To', val: `${form.to} · ${form.toEmail}` },
+                  { key: 'From', val: form.from || '—' },
+                  { key: 'Subject', val: form.subject || tmpl.name },
+                  {
+                    key: 'Delivers',
+                    val: delAt
+                      ? `${fmtDate(delAt)} (${days?.toLocaleString()} days from now)`
+                      : '—',
+                  },
+                ].map(r => (
+                  <div className="cm-row" key={r.key}>
+                    <span className="cm-key">{r.key}</span>
+                    <span className="cm-val">{r.val}</span>
+                  </div>
+                ))}
+                <div className="cm-row">
+                  <span className="cm-key">Message</span>
+                  <span className="cm-val cm-msg">{form.message}</span>
+                </div>
+              </div>
+
+              {/* Full email preview */}
+              <div className="confirm-preview">
+                <p className="prev-label" style={{ marginBottom: '0.65rem' }}>
+                  ✦ Email preview
+                </p>
+                <EmailPreview templateId={selectedTemplate} form={form} />
+              </div>
+
+              {/* Actions */}
+              <div className="confirm-actions">
+                <button className="seal-btn" onClick={handleSubmit} disabled={submitting}>
+                  {submitting ? '✦ Sealing...' : '✦ Seal & Send Into Time'}
+                </button>
+                <button className="btn-g" onClick={() => setStep(2)}>
+                  ← Edit
+                </button>
+                <button className="btn-g" onClick={() => setStep(1)}>
+                  Change Template
+                </button>
+              </div>
+              <p
+                style={{
+                  fontFamily: 'monospace',
+                  fontSize: '0.58rem',
+                  color: 'rgba(200,184,152,0.28)',
+                  marginTop: '0.75rem',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                {capsuleCount} of {FREE_LIMIT} capsules used
+              </p>
             </div>
           </>
         )}
