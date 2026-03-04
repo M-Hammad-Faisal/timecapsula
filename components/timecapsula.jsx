@@ -1086,7 +1086,7 @@ export default function TimeCapsula() {
                 </div>
 
                 {delivery && (
-                  <div className="delivery-preview reveal">
+                  <div className="delivery-preview">
                     <p>
                       ✦ This capsule will be sealed for{' '}
                       <strong>{delivery.days?.toLocaleString()} days</strong> and delivered on{' '}

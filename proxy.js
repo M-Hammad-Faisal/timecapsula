@@ -24,14 +24,9 @@ export async function proxy(request) {
   )
 
   // Refresh session — important, do not remove
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  await supabase.auth.getUser()
 
-  // Protect /dashboard — redirect to home if not logged in
-  if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/', request.url))
-  }
+  // No redirect for /dashboard — the Dashboard component handles its own login UI
 
   return supabaseResponse
 }
