@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY  // service role — never expose this client-side
+  process.env.SUPABASE_SERVICE_ROLE_KEY // service role — never expose this client-side
 )
 
 export async function POST(request) {
@@ -61,7 +61,6 @@ export async function POST(request) {
       id: data.id,
       deliverAt: data.deliver_at,
     })
-
   } catch (err) {
     console.error('Unexpected error:', err)
     return Response.json({ error: 'Something went wrong' }, { status: 500 })

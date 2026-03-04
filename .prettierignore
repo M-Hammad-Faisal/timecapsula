@@ -1,0 +1,8 @@
+# Don't format these
+.next/
+node_modules/
+out/
+build/
+.env*
+*.sql
+supabase/functions/**/*.ts

@@ -1,0 +1,61 @@
+# ─── Dependencies ────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ─── Next.js ─────────────────────────────────
+.next/
+out/
+build/
+
+# ─── Environment Variables ───────────────────
+# NEVER commit these — add to Vercel dashboard instead
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+
+# ─── Supabase ────────────────────────────────
+.supabase/
+supabase/.temp/
+
+# ─── OS Files ────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+
+# ─── Editor ──────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# ─── Logs ────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ─── Testing ─────────────────────────────────
+coverage/
+.nyc_output/
+
+# ─── Misc ────────────────────────────────────
+*.pem
+.vercel
+*.tsbuildinfo
+next-env.d.ts

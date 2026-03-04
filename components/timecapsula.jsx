@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from 'react'
 
-const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@300;400&display=swap');`;
+const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@300;400&display=swap');`
 
 const styles = `
   ${FONTS}
@@ -527,7 +527,7 @@ const styles = `
 
   /* ACTIVE NAV */
   .nav-active { color: var(--amber) !important; }
-`;
+`
 
 // Stars component
 function Stars() {
@@ -540,7 +540,7 @@ function Stars() {
     delay: (Math.random() * 5).toFixed(1),
     minOp: (Math.random() * 0.2 + 0.05).toFixed(2),
     maxOp: (Math.random() * 0.6 + 0.3).toFixed(2),
-  }));
+  }))
 
   return (
     <div className="stars-bg">
@@ -561,110 +561,140 @@ function Stars() {
         />
       ))}
     </div>
-  );
+  )
 }
 
 // Envelope SVG
 function EnvelopeSVG({ size = 220 }) {
   return (
     <svg width={size} height={size * 0.7} viewBox="0 0 220 154" fill="none">
-      <rect x="2" y="2" width="216" height="150" rx="4" fill="rgba(232,168,76,0.08)" stroke="rgba(232,168,76,0.4)" strokeWidth="1.5"/>
-      <path d="M2 12 L110 80 L218 12" stroke="rgba(232,168,76,0.5)" strokeWidth="1.5" fill="none"/>
-      <path d="M2 152 L75 82" stroke="rgba(232,168,76,0.3)" strokeWidth="1"/>
-      <path d="M218 152 L145 82" stroke="rgba(232,168,76,0.3)" strokeWidth="1"/>
-      <circle cx="110" cy="77" r="6" fill="rgba(232,168,76,0.6)"/>
-      <path d="M90 50 Q110 40 130 50" stroke="rgba(232,168,76,0.2)" strokeWidth="1" fill="none"/>
+      <rect
+        x="2"
+        y="2"
+        width="216"
+        height="150"
+        rx="4"
+        fill="rgba(232,168,76,0.08)"
+        stroke="rgba(232,168,76,0.4)"
+        strokeWidth="1.5"
+      />
+      <path d="M2 12 L110 80 L218 12" stroke="rgba(232,168,76,0.5)" strokeWidth="1.5" fill="none" />
+      <path d="M2 152 L75 82" stroke="rgba(232,168,76,0.3)" strokeWidth="1" />
+      <path d="M218 152 L145 82" stroke="rgba(232,168,76,0.3)" strokeWidth="1" />
+      <circle cx="110" cy="77" r="6" fill="rgba(232,168,76,0.6)" />
+      <path d="M90 50 Q110 40 130 50" stroke="rgba(232,168,76,0.2)" strokeWidth="1" fill="none" />
       {[...Array(5)].map((_, i) => (
-        <line key={i} x1="70" y1={100 + i*8} x2="150" y2={100 + i*8} stroke="rgba(242,232,213,0.1)" strokeWidth="1"/>
+        <line
+          key={i}
+          x1="70"
+          y1={100 + i * 8}
+          x2="150"
+          y2={100 + i * 8}
+          stroke="rgba(242,232,213,0.1)"
+          strokeWidth="1"
+        />
       ))}
     </svg>
-  );
+  )
 }
 
 // Scroll reveal hook
 function useReveal() {
   useEffect(() => {
-    const els = document.querySelectorAll('.reveal');
+    const els = document.querySelectorAll('.reveal')
     const observer = new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+      entries =>
+        entries.forEach(e => {
+          if (e.isIntersecting) e.target.classList.add('visible')
+        }),
       { threshold: 0.15 }
-    );
-    els.forEach(el => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+    )
+    els.forEach(el => observer.observe(el))
+    return () => observer.disconnect()
+  }, [])
 }
 
 // Delivery date helper
 function getDeliveryText(when, customDate) {
-  if (!when) return null;
-  const now = new Date();
-  let target;
+  if (!when) return null
+  const now = new Date()
+  let target
   if (when === 'custom' && customDate) {
-    target = new Date(customDate);
+    target = new Date(customDate)
   } else {
-    target = new Date(now);
-    const map = { '1y': 1, '5y': 5, '10y': 10, '25y': 25 };
-    target.setFullYear(now.getFullYear() + (map[when] || 0));
+    target = new Date(now)
+    const map = { '1y': 1, '5y': 5, '10y': 10, '25y': 25 }
+    target.setFullYear(now.getFullYear() + (map[when] || 0))
   }
-  const diff = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
-  const dateStr = target.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-  return { dateStr, days: diff };
+  const diff = Math.ceil((target - now) / (1000 * 60 * 60 * 24))
+  const dateStr = target.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+  return { dateStr, days: diff }
 }
 
 // MAIN APP
 export default function TimeCapsula() {
-  const [view, setView] = useState('home'); // home | write | success
+  const [view, setView] = useState('home') // home | write | success
   const [form, setForm] = useState({
-    to: '', toEmail: '', from: '', subject: '', message: '', when: '', customDate: ''
-  });
-  const [submitting, setSubmitting] = useState(false);
-  const [toast, setToast] = useState(null);
-  const writeRef = useRef(null);
+    to: '',
+    toEmail: '',
+    from: '',
+    subject: '',
+    message: '',
+    when: '',
+    customDate: '',
+  })
+  const [submitting, setSubmitting] = useState(false)
+  const [toast, setToast] = useState(null)
+  const writeRef = useRef(null)
 
-  useReveal();
+  useReveal()
 
-  const delivery = getDeliveryText(form.when, form.customDate);
+  const delivery = getDeliveryText(form.when, form.customDate)
 
-  const showToast = (msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3500);
-  };
+  const showToast = msg => {
+    setToast(msg)
+    setTimeout(() => setToast(null), 3500)
+  }
 
   const handleSubmit = async () => {
     if (!form.to || !form.toEmail || !form.message || !form.when) {
-      showToast('Please fill in all required fields ✦');
-      return;
+      showToast('Please fill in all required fields ✦')
+      return
     }
     if (form.when === 'custom' && !form.customDate) {
-      showToast('Please pick a delivery date ✦');
-      return;
+      showToast('Please pick a delivery date ✦')
+      return
     }
-    setSubmitting(true);
+    setSubmitting(true)
     try {
       const res = await fetch('/api/capsules', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
-      });
-      const data = await res.json();
+      })
+      const data = await res.json()
       if (!res.ok) {
-        showToast(data.error || 'Something went wrong. Try again.');
-        return;
+        showToast(data.error || 'Something went wrong. Try again.')
+        return
       }
-      setView('success');
-    } catch (err) {
-      showToast('Network error. Please try again.');
+      setView('success')
+    } catch (_err) {
+      showToast('Network error. Please try again.')
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  };
+  }
 
   const scrollToWrite = () => {
-    setView('home');
+    setView('home')
     setTimeout(() => {
-      writeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
-  };
+      writeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
+  }
 
   return (
     <>
@@ -679,25 +709,69 @@ export default function TimeCapsula() {
         <div className="nav-links">
           <a href="#how">How it works</a>
           <a href="#pricing">Pricing</a>
-          <a href="#write" onClick={e => { e.preventDefault(); scrollToWrite(); }} className="nav-cta">Write a Capsule</a>
+          <a
+            href="#write"
+            onClick={e => {
+              e.preventDefault()
+              scrollToWrite()
+            }}
+            className="nav-cta"
+          >
+            Write a Capsule
+          </a>
         </div>
       </nav>
 
       {view === 'success' ? (
         // SUCCESS SCREEN
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 1 }}>
+        <div
+          style={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
           <div className="success-screen">
             <div className="success-icon">📬</div>
             <h2 className="success-title">Your capsule is sealed.</h2>
             <p className="success-desc">
-              Your message to <strong style={{ color: 'var(--amber)' }}>{form.to}</strong> has been locked away in time.
-              It will be delivered on <strong style={{ color: 'var(--amber)' }}>{delivery?.dateStr}</strong> — {delivery?.days?.toLocaleString()} days from now.
+              Your message to <strong style={{ color: 'var(--amber)' }}>{form.to}</strong> has been
+              locked away in time. It will be delivered on{' '}
+              <strong style={{ color: 'var(--amber)' }}>{delivery?.dateStr}</strong> —{' '}
+              {delivery?.days?.toLocaleString()} days from now.
             </p>
-            <p style={{ color: 'rgba(200,184,152,0.5)', fontSize: '0.85rem', fontStyle: 'italic', marginBottom: '2.5rem' }}>
+            <p
+              style={{
+                color: 'rgba(200,184,152,0.5)',
+                fontSize: '0.85rem',
+                fontStyle: 'italic',
+                marginBottom: '2.5rem',
+              }}
+            >
               A confirmation has been sent to {form.toEmail}
             </p>
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button className="btn-primary" onClick={() => { setForm({ to: '', toEmail: '', from: '', subject: '', message: '', when: '', customDate: '' }); setView('home'); scrollToWrite(); }}>
+            <div
+              style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}
+            >
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  setForm({
+                    to: '',
+                    toEmail: '',
+                    from: '',
+                    subject: '',
+                    message: '',
+                    when: '',
+                    customDate: '',
+                  })
+                  setView('home')
+                  scrollToWrite()
+                }}
+              >
                 Write Another
               </button>
               <button className="btn-ghost" onClick={() => setView('home')}>
@@ -714,14 +788,24 @@ export default function TimeCapsula() {
             <div className="orb orb-2" />
             <p className="hero-eyebrow">✦ Send a message across time ✦</p>
             <h1 className="hero-title">
-              Words that wait<br />for the <em>right moment.</em>
+              Words that wait
+              <br />
+              for the <em>right moment.</em>
             </h1>
             <p className="hero-subtitle">
-              Write a letter, record a memory, or leave a gift — and let it arrive exactly when it matters most.
+              Write a letter, record a memory, or leave a gift — and let it arrive exactly when it
+              matters most.
             </p>
             <div className="hero-cta-group">
-              <button className="btn-primary" onClick={scrollToWrite}>Write Your First Capsule</button>
-              <button className="btn-ghost" onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })}>
+              <button className="btn-primary" onClick={scrollToWrite}>
+                Write Your First Capsule
+              </button>
+              <button
+                className="btn-ghost"
+                onClick={() =>
+                  document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })
+                }
+              >
                 See How It Works
               </button>
             </div>
@@ -735,12 +819,31 @@ export default function TimeCapsula() {
           {/* HOW IT WORKS */}
           <section className="section" id="how">
             <p className="section-label reveal">The ritual</p>
-            <h2 className="section-title reveal">Three steps.<br /><em>A lifetime of impact.</em></h2>
+            <h2 className="section-title reveal">
+              Three steps.
+              <br />
+              <em>A lifetime of impact.</em>
+            </h2>
             <div className="steps">
               {[
-                { num: '01', icon: '✍️', title: 'Write', desc: 'Pour your heart into words. Write to your future self, your children, a friend — or anyone who deserves to receive a piece of you.' },
-                { num: '02', icon: '⏳', title: 'Seal', desc: 'Choose when your capsule opens — 1 year, 10 years, or a specific date. Your words are locked away until the moment is right.' },
-                { num: '03', icon: '📬', title: 'Deliver', desc: 'On the chosen day, your capsule travels through time and lands in their inbox — exactly as you wrote it, perfectly timed.' },
+                {
+                  num: '01',
+                  icon: '✍️',
+                  title: 'Write',
+                  desc: 'Pour your heart into words. Write to your future self, your children, a friend — or anyone who deserves to receive a piece of you.',
+                },
+                {
+                  num: '02',
+                  icon: '⏳',
+                  title: 'Seal',
+                  desc: 'Choose when your capsule opens — 1 year, 10 years, or a specific date. Your words are locked away until the moment is right.',
+                },
+                {
+                  num: '03',
+                  icon: '📬',
+                  title: 'Deliver',
+                  desc: 'On the chosen day, your capsule travels through time and lands in their inbox — exactly as you wrote it, perfectly timed.',
+                },
               ].map(s => (
                 <div className="step-card reveal" key={s.num}>
                   <div className="step-num">{s.num}</div>
@@ -756,12 +859,30 @@ export default function TimeCapsula() {
               <h2 className="section-title reveal">Who sends a capsule?</h2>
               <div className="use-cases">
                 {[
-                  { title: 'Parents to children', text: '"Open this on your 18th birthday. I wrote it the night you were born."' },
-                  { title: 'Couples in love', text: '"For our 10th anniversary. Ten years ago I knew you were the one."' },
-                  { title: 'You, to yourself', text: '"Read this before your next big decision. You already know the answer."' },
-                  { title: 'Friends across time', text: '"Wherever life has taken us — I hope you still laugh the same way."' },
-                  { title: 'Founders & dreamers', text: '"This is what I believed when I started. I wonder if it came true."' },
-                  { title: 'Those leaving legacies', text: '"If you\'re reading this, I am gone. But these words are still mine."' },
+                  {
+                    title: 'Parents to children',
+                    text: '"Open this on your 18th birthday. I wrote it the night you were born."',
+                  },
+                  {
+                    title: 'Couples in love',
+                    text: '"For our 10th anniversary. Ten years ago I knew you were the one."',
+                  },
+                  {
+                    title: 'You, to yourself',
+                    text: '"Read this before your next big decision. You already know the answer."',
+                  },
+                  {
+                    title: 'Friends across time',
+                    text: '"Wherever life has taken us — I hope you still laugh the same way."',
+                  },
+                  {
+                    title: 'Founders & dreamers',
+                    text: '"This is what I believed when I started. I wonder if it came true."',
+                  },
+                  {
+                    title: 'Those leaving legacies',
+                    text: '"If you\'re reading this, I am gone. But these words are still mine."',
+                  },
                 ].map(u => (
                   <div className="use-case reveal" key={u.title}>
                     <h4 className="use-case-title">{u.title}</h4>
@@ -869,7 +990,9 @@ export default function TimeCapsula() {
                 {delivery && (
                   <div className="delivery-preview reveal">
                     <p>
-                      ✦ This capsule will be sealed for <strong>{delivery.days?.toLocaleString()} days</strong> and delivered on <strong>{delivery.dateStr}</strong>
+                      ✦ This capsule will be sealed for{' '}
+                      <strong>{delivery.days?.toLocaleString()} days</strong> and delivered on{' '}
+                      <strong>{delivery.dateStr}</strong>
                     </p>
                   </div>
                 )}
@@ -879,11 +1002,22 @@ export default function TimeCapsula() {
                     className="btn-primary"
                     onClick={handleSubmit}
                     disabled={submitting}
-                    style={{ fontSize: '1.1rem', padding: '1.1rem 3rem', opacity: submitting ? 0.7 : 1 }}
+                    style={{
+                      fontSize: '1.1rem',
+                      padding: '1.1rem 3rem',
+                      opacity: submitting ? 0.7 : 1,
+                    }}
                   >
                     {submitting ? '✦ Sealing your capsule...' : '✦ Seal & Send Into Time'}
                   </button>
-                  <p style={{ color: 'var(--parchment-dim)', fontSize: '0.8rem', marginTop: '1rem', fontStyle: 'italic' }}>
+                  <p
+                    style={{
+                      color: 'var(--parchment-dim)',
+                      fontSize: '0.8rem',
+                      marginTop: '1rem',
+                      fontStyle: 'italic',
+                    }}
+                  >
                     Free · No account required for your first capsule
                   </p>
                 </div>
@@ -896,36 +1030,79 @@ export default function TimeCapsula() {
           {/* PRICING */}
           <section className="section" id="pricing">
             <p className="section-label reveal">Simple pricing</p>
-            <h2 className="section-title reveal">Begin for free.<br /><em>Grow through time.</em></h2>
+            <h2 className="section-title reveal">
+              Begin for free.
+              <br />
+              <em>Grow through time.</em>
+            </h2>
             <div className="pricing-grid">
               {[
                 {
-                  tier: 'Free', amount: '$0', desc: 'For your first capsule',
-                  features: ['3 text capsules', 'Up to 1 year ahead', 'Email delivery', 'Basic themes'],
-                  cta: 'Start Free'
+                  tier: 'Free',
+                  amount: '$0',
+                  desc: 'For your first capsule',
+                  features: [
+                    '3 text capsules',
+                    'Up to 1 year ahead',
+                    'Email delivery',
+                    'Basic themes',
+                  ],
+                  cta: 'Start Free',
                 },
                 {
-                  tier: 'Personal', amount: '$4', per: '/mo', desc: 'For the storytellers', featured: true,
-                  features: ['Unlimited capsules', '50 years into the future', 'Voice note attachments', 'Photo & video support', 'Priority delivery'],
-                  cta: 'Go Personal'
+                  tier: 'Personal',
+                  amount: '$4',
+                  per: '/mo',
+                  desc: 'For the storytellers',
+                  featured: true,
+                  features: [
+                    'Unlimited capsules',
+                    '50 years into the future',
+                    'Voice note attachments',
+                    'Photo & video support',
+                    'Priority delivery',
+                  ],
+                  cta: 'Go Personal',
                 },
                 {
-                  tier: 'Family', amount: '$12', per: '/mo', desc: 'For legacies',
-                  features: ['Everything in Personal', 'Family vault (6 members)', 'Shared memory timeline', 'PDF & print export', 'Custom delivery domain'],
-                  cta: 'Build a Legacy'
+                  tier: 'Family',
+                  amount: '$12',
+                  per: '/mo',
+                  desc: 'For legacies',
+                  features: [
+                    'Everything in Personal',
+                    'Family vault (6 members)',
+                    'Shared memory timeline',
+                    'PDF & print export',
+                    'Custom delivery domain',
+                  ],
+                  cta: 'Build a Legacy',
                 },
                 {
-                  tier: 'Lifetime', amount: '$49', desc: 'One time, forever', special: true,
-                  features: ['Everything in Personal', 'Locked in today\'s price', 'Lifetime storage guarantee', 'Beta feature access'],
-                  cta: 'Own It Forever'
-                }
+                  tier: 'Lifetime',
+                  amount: '$49',
+                  desc: 'One time, forever',
+                  special: true,
+                  features: [
+                    'Everything in Personal',
+                    "Locked in today's price",
+                    'Lifetime storage guarantee',
+                    'Beta feature access',
+                  ],
+                  cta: 'Own It Forever',
+                },
               ].map(p => (
                 <div className={`price-card reveal ${p.featured ? 'featured' : ''}`} key={p.tier}>
                   <p className="price-tier">{p.tier}</p>
-                  <div className="price-amount">{p.amount}<span>{p.per || ''}</span></div>
+                  <div className="price-amount">
+                    {p.amount}
+                    <span>{p.per || ''}</span>
+                  </div>
                   <p className="price-desc">{p.desc}</p>
                   <ul className="price-features">
-                    {p.features.map(f => <li key={f}>{f}</li>)}
+                    {p.features.map(f => (
+                      <li key={f}>{f}</li>
+                    ))}
                   </ul>
                   <button
                     className={p.featured ? 'btn-primary' : 'btn-ghost'}
@@ -941,7 +1118,9 @@ export default function TimeCapsula() {
 
           {/* FOOTER */}
           <footer>
-            <div className="footer-logo">Time<span style={{ fontStyle: 'italic', color: 'var(--gold)' }}>Capsula</span></div>
+            <div className="footer-logo">
+              Time<span style={{ fontStyle: 'italic', color: 'var(--gold)' }}>Capsula</span>
+            </div>
             <p className="footer-note">Words sealed with care · Delivered across time</p>
             <p className="footer-note" style={{ color: 'rgba(200,184,152,0.3)' }}>
               Built with Claude · © {new Date().getFullYear()}
@@ -952,5 +1131,5 @@ export default function TimeCapsula() {
 
       {toast && <div className="toast">✦ {toast}</div>}
     </>
-  );
+  )
 }
