@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your magic link · TimeCapsula</title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background: #080c14;
+      font-family: Georgia, 'Times New Roman', serif;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      style="background: #080c14; min-height: 100vh"
+    >
+      <tr>
+        <td align="center" style="padding: 48px 16px">
+          <table
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="max-width: 520px; width: 100%"
+          >
+            <!-- STARS HEADER -->
+            <tr>
+              <td align="center" style="padding-bottom: 32px">
+                <p
+                  style="
+                    margin: 0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 11px;
+                    letter-spacing: 6px;
+                    text-transform: uppercase;
+                    color: rgba(232, 168, 76, 0.5);
+                  "
+                >
+                  · · · ✦ · · ·
+                </p>
+              </td>
+            </tr>
+
+            <!-- CARD -->
+            <tr>
+              <td
+                style="
+                  background: #0d1525;
+                  border: 1px solid rgba(232, 168, 76, 0.18);
+                  border-radius: 6px;
+                  overflow: hidden;
+                "
+              >
+                <!-- CARD HEADER -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td
+                      style="
+                        background: linear-gradient(135deg, #0d1525, #111d35);
+                        padding: 36px 40px 28px;
+                        text-align: center;
+                        border-bottom: 1px solid rgba(232, 168, 76, 0.12);
+                      "
+                    >
+                      <p
+                        style="
+                          margin: 0 0 10px;
+                          font-family: 'Courier New', monospace;
+                          font-size: 9px;
+                          letter-spacing: 5px;
+                          text-transform: uppercase;
+                          color: rgba(232, 168, 76, 0.7);
+                        "
+                      >
+                        ✦ &nbsp; TIME CAPSULA &nbsp; ✦
+                      </p>
+                      <p
+                        style="
+                          margin: 0;
+                          font-size: 26px;
+                          font-weight: 700;
+                          color: #f2e8d5;
+                          line-height: 1.2;
+                        "
+                      >
+                        Your vault awaits.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- CARD BODY -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="padding: 36px 40px">
+                      <!-- GREETING -->
+                      <p
+                        style="
+                          margin: 0 0 20px;
+                          font-size: 15px;
+                          line-height: 1.8;
+                          color: #c8b898;
+                          font-style: italic;
+                        "
+                      >
+                        Someone (probably you) asked for a magic link to sign into TimeCapsula.
+                        Click the button below — no password needed, ever.
+                      </p>
+
+                      <!-- BUTTON -->
+                      <table
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                        style="margin: 28px 0"
+                      >
+                        <tr>
+                          <td align="center">
+                            <a
+                              href="{{ .ConfirmationURL }}"
+                              style="
+                                display: inline-block;
+                                background: #e8a84c;
+                                color: #1a1005;
+                                text-decoration: none;
+                                padding: 14px 40px;
+                                border-radius: 2px;
+                                font-family: 'Courier New', monospace;
+                                font-size: 12px;
+                                letter-spacing: 3px;
+                                text-transform: uppercase;
+                                font-weight: 700;
+                              "
+                            >
+                              ✦ &nbsp; Open My Vault
+                            </a>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <!-- EXPIRY NOTE -->
+                      <table
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                        style="
+                          background: rgba(232, 168, 76, 0.06);
+                          border: 1px solid rgba(232, 168, 76, 0.15);
+                          border-radius: 3px;
+                          margin: 0 0 28px;
+                        "
+                      >
+                        <tr>
+                          <td style="padding: 14px 18px">
+                            <p
+                              style="
+                                margin: 0;
+                                font-family: 'Courier New', monospace;
+                                font-size: 10px;
+                                letter-spacing: 1px;
+                                color: rgba(200, 184, 152, 0.7);
+                                line-height: 1.6;
+                              "
+                            >
+                              ⏳ &nbsp; This link expires in
+                              <strong style="color: #e8a84c">1 hour.</strong>
+                              If you didn't request this, you can safely ignore this email.
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <!-- DIVIDER -->
+                      <table
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                        style="margin: 0 0 24px"
+                      >
+                        <tr>
+                          <td
+                            style="
+                              border-top: 1px solid rgba(232, 168, 76, 0.1);
+                              font-size: 0;
+                              line-height: 0;
+                            "
+                          >
+                            &nbsp;
+                          </td>
+                        </tr>
+                      </table>
+
+                      <!-- WHAT'S INSIDE -->
+                      <p
+                        style="
+                          margin: 0 0 14px;
+                          font-family: 'Courier New', monospace;
+                          font-size: 9px;
+                          letter-spacing: 4px;
+                          text-transform: uppercase;
+                          color: rgba(232, 168, 76, 0.6);
+                        "
+                      >
+                        What's inside your vault
+                      </p>
+
+                      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td style="padding: 6px 0">
+                            <table cellpadding="0" cellspacing="0" border="0">
+                              <tr>
+                                <td
+                                  style="
+                                    color: #e8a84c;
+                                    font-size: 9px;
+                                    padding-right: 10px;
+                                    vertical-align: top;
+                                    padding-top: 4px;
+                                  "
+                                >
+                                  ✦
+                                </td>
+                                <td style="color: #c8b898; font-size: 13px; line-height: 1.6">
+                                  10 free capsules to send across time
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 6px 0">
+                            <table cellpadding="0" cellspacing="0" border="0">
+                              <tr>
+                                <td
+                                  style="
+                                    color: #e8a84c;
+                                    font-size: 9px;
+                                    padding-right: 10px;
+                                    vertical-align: top;
+                                    padding-top: 4px;
+                                  "
+                                >
+                                  ✦
+                                </td>
+                                <td style="color: #c8b898; font-size: 13px; line-height: 1.6">
+                                  3 beautiful templates to choose from
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 6px 0">
+                            <table cellpadding="0" cellspacing="0" border="0">
+                              <tr>
+                                <td
+                                  style="
+                                    color: #e8a84c;
+                                    font-size: 9px;
+                                    padding-right: 10px;
+                                    vertical-align: top;
+                                    padding-top: 4px;
+                                  "
+                                >
+                                  ✦
+                                </td>
+                                <td style="color: #c8b898; font-size: 13px; line-height: 1.6">
+                                  Dashboard to track your sealed capsules
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 6px 0">
+                            <table cellpadding="0" cellspacing="0" border="0">
+                              <tr>
+                                <td
+                                  style="
+                                    color: #e8a84c;
+                                    font-size: 9px;
+                                    padding-right: 10px;
+                                    vertical-align: top;
+                                    padding-top: 4px;
+                                  "
+                                >
+                                  ✦
+                                </td>
+                                <td style="color: #c8b898; font-size: 13px; line-height: 1.6">
+                                  Edit messages before they deliver
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <!-- LINK FALLBACK -->
+                      <table
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                        style="margin-top: 28px"
+                      >
+                        <tr>
+                          <td
+                            style="
+                              border-top: 1px solid rgba(232, 168, 76, 0.08);
+                              padding-top: 20px;
+                            "
+                          >
+                            <p
+                              style="
+                                margin: 0 0 6px;
+                                font-family: 'Courier New', monospace;
+                                font-size: 9px;
+                                letter-spacing: 2px;
+                                color: rgba(200, 184, 152, 0.35);
+                                text-transform: uppercase;
+                              "
+                            >
+                              Button not working? Copy this link:
+                            </p>
+                            <p
+                              style="
+                                margin: 0;
+                                font-family: 'Courier New', monospace;
+                                font-size: 10px;
+                                color: rgba(232, 168, 76, 0.5);
+                                word-break: break-all;
+                                line-height: 1.6;
+                              "
+                            >
+                              {{ .ConfirmationURL }}
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- CARD FOOTER -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td
+                      style="
+                        padding: 18px 40px 24px;
+                        text-align: center;
+                        border-top: 1px solid rgba(232, 168, 76, 0.08);
+                      "
+                    >
+                      <p
+                        style="
+                          margin: 0;
+                          font-family: 'Courier New', monospace;
+                          font-size: 8px;
+                          letter-spacing: 3px;
+                          text-transform: uppercase;
+                          color: rgba(200, 184, 152, 0.3);
+                        "
+                      >
+                        timecapsula.website · words sealed with care
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- FOOTER STARS -->
+            <tr>
+              <td align="center" style="padding-top: 28px">
+                <p
+                  style="
+                    margin: 0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 11px;
+                    letter-spacing: 6px;
+                    color: rgba(232, 168, 76, 0.25);
+                  "
+                >
+                  · · · ✦ · · ·
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

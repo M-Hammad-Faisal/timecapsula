@@ -129,12 +129,25 @@ const styles = `
   .loading-text { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--amber); letter-spacing: 0.2em; animation: pulse 1.5s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
 
-  @media (max-width: 600px) {
-    nav { padding: 1rem; }
+  @media (max-width: 720px) {
+    nav { padding: 0.85rem 1.1rem; }
     .user-email { display: none; }
-    .stats { grid-template-columns: 1fr 1fr; }
-    .capsule-card-row { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr 1fr; gap: 0.65rem; }
+    .stat-card { padding: 1rem; }
+    .stat-num { font-size: 1.8rem; }
+    .page { padding: 1.5rem 1rem; }
+    .dashboard-title { font-size: 1.5rem; }
+    .capsule-card-row { grid-template-columns: 1fr; gap: 0.5rem; }
     .days-left { text-align: left; }
+    .capsule-actions { flex-wrap: wrap; gap: 0.4rem; }
+    .btn-sm { font-size: 0.58rem; padding: 0.35rem 0.65rem; }
+    .modal { padding: 1.5rem; margin: 1rem; }
+    .section-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+  }
+  @media (max-width: 420px) {
+    .stats { grid-template-columns: 1fr; }
+    nav { gap: 0.5rem; }
+    .user-email { display: none; }
   }
 `
 

@@ -44,6 +44,14 @@ const styles = `
   .btn-ghost:hover { border-color:var(--amber); color:var(--amber); }
   .loading-text { font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--amber); letter-spacing:0.2em; animation:pulse 1.5s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+  @media (max-width: 540px) {
+    .login-card { padding: 2rem 1.5rem; }
+    .card-title { font-size: 1.6rem; }
+    .perks { grid-template-columns: 1fr; gap: 0.5rem; }
+    .back-link { top: 1rem; left: 1rem; }
+    .logo-top { top: 1rem; right: 1rem; font-size: 1rem; }
+  }
 `
 
 function Stars() {

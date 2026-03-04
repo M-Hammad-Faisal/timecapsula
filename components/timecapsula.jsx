@@ -572,7 +572,213 @@ const styles = `
 
   /* ACTIVE NAV */
   .nav-active { color: var(--amber) !important; }
+
+  /* ── MOBILE NAV ── */
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; z-index: 110; }
+  .hamburger span { display: block; width: 22px; height: 2px; background: var(--parchment-dim); border-radius: 2px; transition: all 0.3s; }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  @media (max-width: 720px) {
+    nav { padding: 1rem 1.2rem; }
+    .hamburger { display: flex; }
+    .nav-links {
+      display: none;
+      position: fixed;
+      inset: 0;
+      top: 56px;
+      background: rgba(8,12,20,0.98);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+      z-index: 105;
+      backdrop-filter: blur(16px);
+    }
+    .nav-links.nav-open { display: flex; }
+    .nav-links a { font-size: 1.1rem; letter-spacing: 0.2em; }
+    .nav-cta { padding: 0.75rem 2rem; }
+  }
+
+  /* ── GENERAL MOBILE ── */
+  @media (max-width: 720px) {
+    .section { padding: 5rem 1.2rem; }
+    .hero { padding: 5rem 1.2rem 3rem; }
+    .hero-cta-group { flex-direction: column; align-items: center; }
+    .hero-cta-group .btn-primary, .hero-cta-group .btn-ghost { width: 100%; max-width: 280px; text-align: center; }
+    .envelope-hero svg { width: 160px !important; height: auto !important; }
+    .counter-row { gap: 2rem; }
+    .counter-num { font-size: 2.5rem; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: 1fr; }
+    .use-cases { grid-template-columns: 1fr; }
+    footer { flex-direction: column; text-align: center; padding: 2rem 1.2rem; gap: 0.5rem; }
+    .section-title { font-size: clamp(1.6rem, 6vw, 2.5rem); }
+  }
+
+  @media (max-width: 480px) {
+    .hero-title { font-size: clamp(2.4rem, 9vw, 4rem); }
+    .counter-row { gap: 1.5rem; }
+    .counter-num { font-size: 2rem; }
+    .counter-label { font-size: 0.55rem; }
+    .price-card { padding: 1.75rem; }
+    .step-card { padding: 1.75rem; }
+  }
+
+  /* ── GUEST PREVIEW ── */
+  .guest-preview-wrap { margin-top: 2.5rem; }
+  .guest-preview-label { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.65rem; opacity: 0.8; }
+  .guest-preview-note { font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; color: rgba(200,184,152,0.3); text-align: center; margin-top: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* ── PRICING COMING SOON ── */
+  .price-card.coming-soon { opacity: 0.7; position: relative; }
+  .coming-soon-badge {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: rgba(232,168,76,0.15); color: var(--amber);
+    border: 1px solid rgba(232,168,76,0.4);
+    font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em;
+    padding: 3px 12px; border-radius: 2px; white-space: nowrap;
+  }
+  .price-features li.locked-feat { opacity: 0.45; }
+  .price-features li.locked-feat::before { content: '🔒'; font-size: 0.55rem; }
 `
+
+// Inline email preview for guest form
+function GuestEmailPreview({ form }) {
+  const accent = '#e8a84c'
+  const bg = '#080c14'
+  const border = 'rgba(232,168,76,0.2)'
+  const text = '#f2e8d5'
+  const dim = '#c8b898'
+  const to = form.to || 'Recipient'
+  const from = form.from || 'Someone who cares'
+  const subject = form.subject || 'A message from the past'
+  const message = form.message || 'Your message will appear here as you write above...'
+  const msgHTML = message
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br/>')
+  return (
+    <div
+      style={{
+        background: bg,
+        borderRadius: 6,
+        overflow: 'hidden',
+        border: `1px solid ${border}`,
+        fontFamily: 'Georgia,serif',
+      }}
+    >
+      <div
+        style={{
+          background: 'rgba(0,0,0,0.25)',
+          padding: '7px 12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 5,
+        }}
+      >
+        {['rgba(255,80,80,0.5)', 'rgba(255,200,0,0.5)', 'rgba(80,200,80,0.5)'].map((c, i) => (
+          <div key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: c }} />
+        ))}
+        <span
+          style={{
+            fontFamily: 'monospace',
+            fontSize: 9,
+            color: 'rgba(255,255,255,0.22)',
+            marginLeft: 6,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          To: {form.toEmail || 'recipient@email.com'} · {subject}
+        </span>
+      </div>
+      <div
+        style={{
+          background: 'linear-gradient(135deg,#0d1525,#111d35)',
+          padding: '20px 22px 14px',
+          textAlign: 'center',
+          borderBottom: `1px solid ${border}`,
+        }}
+      >
+        <p
+          style={{
+            margin: '0 0 6px',
+            fontFamily: 'monospace',
+            fontSize: 8,
+            letterSpacing: 4,
+            textTransform: 'uppercase',
+            color: accent,
+          }}
+        >
+          ✦ Time Capsula ✦
+        </p>
+        <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: text, lineHeight: 1.3 }}>
+          {subject}
+        </p>
+      </div>
+      <div style={{ padding: '18px 22px' }}>
+        <p
+          style={{
+            margin: '0 0 3px',
+            fontSize: 8,
+            letterSpacing: 2,
+            textTransform: 'uppercase',
+            color: accent,
+            fontFamily: 'monospace',
+          }}
+        >
+          Dear {to},
+        </p>
+        <div
+          style={{
+            margin: '10px 0',
+            padding: '12px 16px',
+            background: 'rgba(255,255,255,0.03)',
+            borderLeft: `2px solid ${accent}`,
+            borderRadius: '0 3px 3px 0',
+          }}
+        >
+          <p
+            style={{ margin: 0, fontSize: 13, lineHeight: 1.8, color: text }}
+            dangerouslySetInnerHTML={{ __html: msgHTML }}
+          />
+        </div>
+        <p
+          style={{
+            margin: '8px 0 0',
+            fontSize: 12,
+            color: dim,
+            textAlign: 'right',
+            fontStyle: 'italic',
+          }}
+        >
+          — {from}
+        </p>
+      </div>
+      <div
+        style={{ padding: '8px 22px 14px', textAlign: 'center', borderTop: `1px solid ${border}` }}
+      >
+        <p
+          style={{
+            margin: 0,
+            fontSize: 8,
+            letterSpacing: 2,
+            textTransform: 'uppercase',
+            color: dim,
+            fontFamily: 'monospace',
+          }}
+        >
+          timecapsula.website · words sealed with care
+        </p>
+      </div>
+    </div>
+  )
+}
 
 // Stars component
 function Stars() {
@@ -747,6 +953,7 @@ export default function TimeCapsula() {
   })
   const [submitting, setSubmitting] = useState(false)
   const [toast, setToast] = useState(null)
+  const [navOpen, setNavOpen] = useState(false)
   const writeRef = useRef(null)
 
   useReveal()
@@ -805,19 +1012,40 @@ export default function TimeCapsula() {
 
       {/* NAV */}
       <nav>
-        <div className="logo" onClick={() => setView('home')} style={{ cursor: 'pointer' }}>
+        <div
+          className="logo"
+          onClick={() => {
+            setView('home')
+            setNavOpen(false)
+          }}
+          style={{ cursor: 'pointer' }}
+        >
           Time<span>Capsula</span>
         </div>
-        <div className="nav-links">
-          <a href="#how">How it works</a>
-          <a href="#pricing">Pricing</a>
-          <a href="/login" style={{ color: 'var(--amber)' }}>
+        <button
+          className={`hamburger ${navOpen ? 'open' : ''}`}
+          onClick={() => setNavOpen(o => !o)}
+          aria-label="Menu"
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+        <div className={`nav-links ${navOpen ? 'nav-open' : ''}`}>
+          <a href="#how" onClick={() => setNavOpen(false)}>
+            How it works
+          </a>
+          <a href="#pricing" onClick={() => setNavOpen(false)}>
+            Pricing
+          </a>
+          <a href="/login" style={{ color: 'var(--amber)' }} onClick={() => setNavOpen(false)}>
             Sign In
           </a>
           <a
             href="#write"
             onClick={e => {
               e.preventDefault()
+              setNavOpen(false)
               scrollToWrite()
             }}
             className="nav-cta"
@@ -1132,6 +1360,15 @@ export default function TimeCapsula() {
                     for unlimited
                   </p>
                 </div>
+
+                {/* Live email preview for guests */}
+                <div className="guest-preview-wrap reveal">
+                  <p className="guest-preview-label">
+                    ✦ Live email preview — this is exactly what they'll receive
+                  </p>
+                  <GuestEmailPreview form={form} />
+                  <p className="guest-preview-note">Sign in to unlock 15 beautiful templates</p>
+                </div>
               </div>
             </div>
           </section>
@@ -1159,6 +1396,7 @@ export default function TimeCapsula() {
                     'Email delivery',
                   ],
                   cta: 'Try Free Now',
+                  comingSoon: false,
                 },
                 {
                   tier: 'Free Account',
@@ -1174,39 +1412,31 @@ export default function TimeCapsula() {
                     'Dashboard & history',
                   ],
                   cta: 'Sign Up Free',
+                  comingSoon: false,
                 },
                 {
                   tier: 'Personal',
-                  amount: '$4',
+                  amount: '$5',
                   per: '/mo',
                   desc: 'For the storytellers',
                   features: [
-                    'Unlimited capsules',
-                    'Deliver up to 10 years ahead',
-                    'All 15 templates included',
-                    'Voice note attachments',
-                    'Photo support',
-                    'Priority delivery',
+                    { text: '10 capsules per month (resets)', locked: false },
+                    { text: 'Deliver up to 10 years ahead', locked: false },
+                    { text: 'All 15 templates unlocked', locked: false },
+                    { text: 'Attach 2 images per capsule', locked: false },
+                    { text: '1 video attachment', locked: false },
+                    { text: '1 voice note attachment', locked: false },
                   ],
-                  cta: 'Go Personal',
-                },
-                {
-                  tier: 'Ultimate',
-                  amount: '$49',
-                  desc: 'One time, forever',
-                  special: true,
-                  features: [
-                    'Everything in Personal',
-                    'Deliver up to 50 years ahead',
-                    'Lifetime storage guarantee',
-                    'Family vault (6 members)',
-                    'Beta feature access',
-                    'Locked-in price forever',
-                  ],
-                  cta: 'Own It Forever',
+                  cta: 'Coming Soon',
+                  comingSoon: true,
                 },
               ].map(p => (
-                <div className={`price-card reveal ${p.featured ? 'featured' : ''}`} key={p.tier}>
+                <div
+                  className={`price-card reveal ${p.featured ? 'featured' : ''} ${p.comingSoon ? 'coming-soon' : ''}`}
+                  key={p.tier}
+                  style={{ position: 'relative' }}
+                >
+                  {p.comingSoon && <div className="coming-soon-badge">✦ Coming Soon</div>}
                   <p className="price-tier">{p.tier}</p>
                   <div className="price-amount">
                     {p.amount}
@@ -1214,17 +1444,28 @@ export default function TimeCapsula() {
                   </div>
                   <p className="price-desc">{p.desc}</p>
                   <ul className="price-features">
-                    {p.features.map(f => (
-                      <li key={f}>{f}</li>
-                    ))}
+                    {p.features.map(f => {
+                      const text = typeof f === 'string' ? f : f.text
+                      const locked = typeof f === 'object' && f.locked
+                      return (
+                        <li key={text} className={locked ? 'locked-feat' : ''}>
+                          {text}
+                        </li>
+                      )
+                    })}
                   </ul>
                   <button
                     className={p.featured ? 'btn-primary' : 'btn-ghost'}
-                    style={{ width: '100%' }}
+                    style={{
+                      width: '100%',
+                      opacity: p.comingSoon ? 0.5 : 1,
+                      cursor: p.comingSoon ? 'not-allowed' : 'pointer',
+                    }}
+                    disabled={p.comingSoon}
                     onClick={() => {
+                      if (p.comingSoon) return
                       if (p.tier === 'Guest') scrollToWrite()
                       else if (p.tier === 'Free Account') window.location.href = '/login'
-                      else scrollToWrite()
                     }}
                   >
                     {p.cta}
