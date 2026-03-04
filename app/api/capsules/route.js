@@ -1,10 +1,12 @@
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { createClient as createUserClient } from '../../../lib/supabase/server'
 
-const supabase = createServiceClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-)
+function getServiceClient() {
+  return createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  )
+}
 
 export async function POST(request) {
   try {
@@ -32,6 +34,7 @@ export async function POST(request) {
       data: { user },
     } = await userClient.auth.getUser()
 
+    const supabase = getServiceClient()
     const { data, error } = await supabase
       .from('capsules')
       .insert({
@@ -52,8 +55,8 @@ export async function POST(request) {
     }
 
     return Response.json({ success: true, id: data.id, deliverAt: data.deliver_at })
-  } catch (err) {
-    console.error('Unexpected error:', err)
+  } catch (_err) {
+    console.error('Unexpected error:', _err)
     return Response.json({ error: 'Something went wrong' }, { status: 500 })
   }
 }
@@ -67,6 +70,7 @@ export async function GET() {
 
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
+    const supabase = getServiceClient()
     const { data, error } = await supabase
       .from('capsules')
       .select('id, to_name, to_email, subject, deliver_at, delivered, created_at')
@@ -76,8 +80,8 @@ export async function GET() {
     if (error) throw error
 
     return Response.json({ capsules: data })
-  } catch (err) {
-    console.error('Error fetching capsules:', err)
+  } catch (_err) {
+    console.error('Error fetching capsules:', _err)
     return Response.json({ error: 'Failed to fetch capsules' }, { status: 500 })
   }
 }
