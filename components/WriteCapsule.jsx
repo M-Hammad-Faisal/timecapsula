@@ -213,27 +213,27 @@ nav{padding:1rem 2rem;display:flex;justify-content:space-between;align-items:cen
 .subhead{color:var(--dim);font-size:0.85rem;font-style:italic;margin-bottom:2rem;}
 
 /* ── STEP 1: template grid ── */
-.tgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:0.65rem;margin-bottom:2.5rem;}
-@media(max-width:1100px){.tgrid{grid-template-columns:repeat(5,1fr);}}
-@media(max-width:860px){.tgrid{grid-template-columns:repeat(4,1fr);}}
-@media(max-width:620px){.tgrid{grid-template-columns:repeat(3,1fr);}}
-@media(max-width:400px){.tgrid{grid-template-columns:repeat(2,1fr);}}
+.tgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.85rem;margin-bottom:2.5rem;}
+@media(max-width:1100px){.tgrid{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:780px){.tgrid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:540px){.tgrid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:340px){.tgrid{grid-template-columns:repeat(1,1fr);}}
 
-.tc{border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.22s;position:relative;}
-.tc:hover:not(.tc-lk){transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,0.5);}
+.tc{border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.22s;position:relative;}
+.tc:hover:not(.tc-lk){transform:translateY(-5px);box-shadow:0 14px 32px rgba(0,0,0,0.55);}
 .tc.sel{border-color:var(--amb);box-shadow:0 0 0 3px rgba(232,168,76,0.22);}
-.tc-prev{height:90px;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;position:relative;}
-.tc-emoji{font-size:1.6rem;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.4));}
-.tc-bar{height:3px;border-radius:2px;width:55%;}
-.tc-line{height:2px;border-radius:1px;opacity:0.25;}
-.tc-meta{padding:7px 9px 10px;}
-.tc-sc{font-family:'JetBrains Mono',monospace;font-size:0.46rem;color:rgba(255,255,255,0.32);margin-bottom:2px;letter-spacing:0.04em;}
-.tc-nm{font-family:'Playfair Display',serif;font-size:0.75rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.tc-ds{font-family:'JetBrains Mono',monospace;font-size:0.44rem;color:rgba(255,255,255,0.22);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.tc-lock{position:absolute;inset:0;background:rgba(6,9,16,0.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;backdrop-filter:blur(2px);}
-.tc-lk-ico{font-size:1.1rem;opacity:0.75;}
-.tc-lk-badge{font-family:'JetBrains Mono',monospace;font-size:0.44rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--amb);background:rgba(232,168,76,0.12);border:1px solid rgba(232,168,76,0.3);padding:3px 8px;border-radius:2px;}
-.tc-lk-price{font-family:'JetBrains Mono',monospace;font-size:0.4rem;color:rgba(232,168,76,0.45);letter-spacing:0.06em;}
+.tc-prev{height:130px;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;}
+.tc-emoji{font-size:2.4rem;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.5));}
+.tc-bar{height:4px;border-radius:2px;width:55%;}
+.tc-line{height:3px;border-radius:2px;opacity:0.25;}
+.tc-meta{padding:10px 13px 13px;}
+.tc-sc{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:rgba(255,255,255,0.4);margin-bottom:3px;letter-spacing:0.06em;text-transform:uppercase;}
+.tc-nm{font-family:'Playfair Display',serif;font-size:1rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tc-ds{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:rgba(255,255,255,0.3);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tc-lock{position:absolute;inset:0;background:rgba(6,9,16,0.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;backdrop-filter:blur(2px);}
+.tc-lk-ico{font-size:1.5rem;opacity:0.75;}
+.tc-lk-badge{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--amb);background:rgba(232,168,76,0.12);border:1px solid rgba(232,168,76,0.3);padding:4px 10px;border-radius:2px;}
+.tc-lk-price{font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:rgba(232,168,76,0.5);letter-spacing:0.06em;}
 
 /* ── Step 1 continue btn ── */
 .cont-wrap{text-align:center;}
