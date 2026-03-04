@@ -1,8 +1,9 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
+import { createClient as createUserClient } from '../../../lib/supabase/server'
 
-const supabase = createClient(
+const supabase = createServiceClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY // service role — never expose this client-side
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 
 export async function POST(request) {
@@ -10,34 +11,24 @@ export async function POST(request) {
     const body = await request.json()
     const { to, toEmail, from, subject, message, when, customDate } = body
 
-    // --- Validation ---
     if (!to || !toEmail || !message || !when) {
-      return Response.json(
-        { error: 'Missing required fields: to, toEmail, message, when' },
-        { status: 400 }
-      )
+      return Response.json({ error: 'Missing required fields' }, { status: 400 })
     }
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(toEmail)) {
       return Response.json({ error: 'Invalid email address' }, { status: 400 })
     }
-
     if (message.length > 5000) {
       return Response.json({ error: 'Message too long (max 5000 chars)' }, { status: 400 })
     }
 
-    // --- Compute delivery date ---
     const deliverAt = computeDeliveryDate(when, customDate)
-    if (!deliverAt) {
-      return Response.json({ error: 'Invalid delivery time' }, { status: 400 })
-    }
+    if (!deliverAt) return Response.json({ error: 'Invalid delivery time' }, { status: 400 })
+    if (deliverAt <= new Date()) return Response.json({ error: 'Delivery date must be in the future' }, { status: 400 })
 
-    if (deliverAt <= new Date()) {
-      return Response.json({ error: 'Delivery date must be in the future' }, { status: 400 })
-    }
+    const userClient = await createUserClient()
+    const { data: { user } } = await userClient.auth.getUser()
 
-    // --- Save to Supabase ---
     const { data, error } = await supabase
       .from('capsules')
       .insert({
@@ -47,6 +38,7 @@ export async function POST(request) {
         subject: subject?.trim() || null,
         message: message.trim(),
         deliver_at: deliverAt.toISOString(),
+        user_id: user?.id || null,
       })
       .select('id, deliver_at')
       .single()
@@ -56,31 +48,47 @@ export async function POST(request) {
       return Response.json({ error: 'Failed to save capsule' }, { status: 500 })
     }
 
-    return Response.json({
-      success: true,
-      id: data.id,
-      deliverAt: data.deliver_at,
-    })
+    return Response.json({ success: true, id: data.id, deliverAt: data.deliver_at })
+
   } catch (err) {
     console.error('Unexpected error:', err)
     return Response.json({ error: 'Something went wrong' }, { status: 500 })
   }
 }
 
-// --- Helpers ---
+export async function GET() {
+  try {
+    const userClient = await createUserClient()
+    const { data: { user } } = await userClient.auth.getUser()
+
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+
+    const { data, error } = await supabase
+      .from('capsules')
+      .select('id, to_name, to_email, subject, deliver_at, delivered, created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+
+    return Response.json({ capsules: data })
+
+  } catch (err) {
+    console.error('Error fetching capsules:', err)
+    return Response.json({ error: 'Failed to fetch capsules' }, { status: 500 })
+  }
+}
+
 function computeDeliveryDate(when, customDate) {
   const now = new Date()
-
   if (when === 'custom') {
     if (!customDate) return null
     const d = new Date(customDate)
     return isNaN(d.getTime()) ? null : d
   }
-
   const yearsMap = { '1y': 1, '5y': 5, '10y': 10, '25y': 25 }
   const years = yearsMap[when]
   if (!years) return null
-
   const target = new Date(now)
   target.setFullYear(now.getFullYear() + years)
   return target
