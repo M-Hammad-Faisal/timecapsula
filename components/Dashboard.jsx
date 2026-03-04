@@ -3,236 +3,10 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '../lib/supabase/client'
 import { EmailPreview } from './WriteCapsule'
+import { TEMPLATES, FREE_IDS } from '../lib/templates'
+import StepBar from './StepBar'
 
-// ── Templates list (mirrors WriteCapsule — only id/name/scenario/card/email needed here) ──
-const TEMPLATES = [
-  {
-    id: 'cosmic',
-    tier: 'free',
-    scenario: '✦ For anyone',
-    name: 'Cosmic Night',
-    card: { bg: '#080c14', accent: '#e8a84c', text: '#f2e8d5' },
-    email: {
-      bg: '#080c14',
-      header: 'linear-gradient(135deg,#0d1525,#111d35)',
-      accent: '#e8a84c',
-      text: '#f2e8d5',
-      dim: '#c8b898',
-      border: 'rgba(232,168,76,0.2)',
-    },
-  },
-  {
-    id: 'dawn',
-    tier: 'free',
-    scenario: '🌅 For hope',
-    name: 'Golden Dawn',
-    card: { bg: '#fff8e8', accent: '#c47a1a', text: '#2a1505' },
-    email: {
-      bg: '#fff8e8',
-      header: 'linear-gradient(135deg,#fff8e8,#fdecc0)',
-      accent: '#c47a1a',
-      text: '#2a1505',
-      dim: '#8a6030',
-      border: 'rgba(196,122,26,0.2)',
-    },
-  },
-  {
-    id: 'midnight-letter',
-    tier: 'free',
-    scenario: '🌙 For yourself',
-    name: 'Midnight Letter',
-    card: { bg: '#0a0f1e', accent: '#8ab4f8', text: '#e8f0ff' },
-    email: {
-      bg: '#0a0f1e',
-      header: 'linear-gradient(135deg,#0f1729,#162040)',
-      accent: '#8ab4f8',
-      text: '#e8f0ff',
-      dim: '#a0b8d8',
-      border: 'rgba(138,180,248,0.2)',
-    },
-  },
-  {
-    id: 'first-birthday',
-    tier: 'premium',
-    scenario: '🎂 For a child',
-    name: 'First Birthday',
-    card: { bg: '#fff0f7', accent: '#e8679a', text: '#2a0a18' },
-    email: {
-      bg: '#fff0f7',
-      header: 'linear-gradient(135deg,#fff0f7,#fdd8ea)',
-      accent: '#e8679a',
-      text: '#2a0a18',
-      dim: '#9a4070',
-      border: 'rgba(232,103,154,0.2)',
-    },
-  },
-  {
-    id: 'graduation',
-    tier: 'premium',
-    scenario: '🎓 For a student',
-    name: 'Graduation Day',
-    card: { bg: '#0f1a0f', accent: '#5cb85c', text: '#e8f5e8' },
-    email: {
-      bg: '#0f1a0f',
-      header: 'linear-gradient(135deg,#0f1a0f,#1a2e1a)',
-      accent: '#5cb85c',
-      text: '#e8f5e8',
-      dim: '#7dc97d',
-      border: 'rgba(92,184,92,0.2)',
-    },
-  },
-  {
-    id: 'wedding',
-    tier: 'premium',
-    scenario: '💍 For a partner',
-    name: 'Wedding Vows',
-    card: { bg: '#1a0f0a', accent: '#c8916a', text: '#f5ede8' },
-    email: {
-      bg: '#1a0f0a',
-      header: 'linear-gradient(135deg,#1a0f0a,#2e1a10)',
-      accent: '#c8916a',
-      text: '#f5ede8',
-      dim: '#a07060',
-      border: 'rgba(200,145,106,0.2)',
-    },
-  },
-  {
-    id: 'startup',
-    tier: 'premium',
-    scenario: '🚀 For a founder',
-    name: 'Day One',
-    card: { bg: '#080c18', accent: '#7c6ef5', text: '#e8e8ff' },
-    email: {
-      bg: '#080c18',
-      header: 'linear-gradient(135deg,#0c1028,#141830)',
-      accent: '#7c6ef5',
-      text: '#e8e8ff',
-      dim: '#9090cc',
-      border: 'rgba(124,110,245,0.2)',
-    },
-  },
-  {
-    id: 'grief',
-    tier: 'premium',
-    scenario: '🕊️ After a loss',
-    name: 'In Loving Memory',
-    card: { bg: '#0f0f18', accent: '#a8b4e8', text: '#e8eaf5' },
-    email: {
-      bg: '#0f0f18',
-      header: 'linear-gradient(135deg,#0f0f20,#18182e)',
-      accent: '#a8b4e8',
-      text: '#e8eaf5',
-      dim: '#8898cc',
-      border: 'rgba(168,180,232,0.2)',
-    },
-  },
-  {
-    id: 'retirement',
-    tier: 'premium',
-    scenario: '🌿 For retirement',
-    name: 'Golden Years',
-    card: { bg: '#1a1500', accent: '#e8c84c', text: '#f8f0d5' },
-    email: {
-      bg: '#1a1500',
-      header: 'linear-gradient(135deg,#1a1500,#2a2000)',
-      accent: '#e8c84c',
-      text: '#f8f0d5',
-      dim: '#c0a870',
-      border: 'rgba(232,200,76,0.2)',
-    },
-  },
-  {
-    id: 'new-year',
-    tier: 'premium',
-    scenario: '🎊 New Year',
-    name: 'Dear January',
-    card: { bg: '#05101e', accent: '#4ad4f5', text: '#e0f8ff' },
-    email: {
-      bg: '#05101e',
-      header: 'linear-gradient(135deg,#05101e,#0a1a2e)',
-      accent: '#4ad4f5',
-      text: '#e0f8ff',
-      dim: '#80c8e0',
-      border: 'rgba(74,212,245,0.2)',
-    },
-  },
-  {
-    id: 'apology',
-    tier: 'premium',
-    scenario: '🤝 To make peace',
-    name: 'Unsent Words',
-    card: { bg: '#180a0a', accent: '#e87878', text: '#fff0f0' },
-    email: {
-      bg: '#180a0a',
-      header: 'linear-gradient(135deg,#180a0a,#280f0f)',
-      accent: '#e87878',
-      text: '#fff0f0',
-      dim: '#c08080',
-      border: 'rgba(232,120,120,0.2)',
-    },
-  },
-  {
-    id: 'milestone',
-    tier: 'premium',
-    scenario: '🏆 For a milestone',
-    name: 'The Summit',
-    card: { bg: '#0f0a00', accent: '#ffa040', text: '#fff5e0' },
-    email: {
-      bg: '#0f0a00',
-      header: 'linear-gradient(135deg,#0f0a00,#201500)',
-      accent: '#ffa040',
-      text: '#fff5e0',
-      dim: '#c08040',
-      border: 'rgba(255,160,64,0.2)',
-    },
-  },
-  {
-    id: 'friendship',
-    tier: 'premium',
-    scenario: '👫 Best friend',
-    name: 'Old Friends',
-    card: { bg: '#0a1808', accent: '#88d068', text: '#f0ffe8' },
-    email: {
-      bg: '#0a1808',
-      header: 'linear-gradient(135deg,#0a1808,#152510)',
-      accent: '#88d068',
-      text: '#f0ffe8',
-      dim: '#80b860',
-      border: 'rgba(136,208,104,0.2)',
-    },
-  },
-  {
-    id: 'diagnosis',
-    tier: 'premium',
-    scenario: '💙 Through illness',
-    name: 'Brave Words',
-    card: { bg: '#08101e', accent: '#60a8e8', text: '#e0f0ff' },
-    email: {
-      bg: '#08101e',
-      header: 'linear-gradient(135deg,#08101e,#101828)',
-      accent: '#60a8e8',
-      text: '#e0f0ff',
-      dim: '#7090c0',
-      border: 'rgba(96,168,232,0.2)',
-    },
-  },
-  {
-    id: 'parchment',
-    tier: 'premium',
-    scenario: '📜 Classic letter',
-    name: 'Vintage Parchment',
-    card: { bg: '#f5e8c8', accent: '#8b4513', text: '#2a1505' },
-    email: {
-      bg: '#f5e8c8',
-      header: 'linear-gradient(135deg,#f5e8c8,#ead8a8)',
-      accent: '#8b4513',
-      text: '#2a1505',
-      dim: '#7a5028',
-      border: 'rgba(139,69,19,0.2)',
-    },
-  },
-]
-const FREE_IDS = ['cosmic', 'dawn', 'midnight-letter']
+// ── TEMPLATES and FREE_IDS imported from lib/templates.js ────────────
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:wght@400;500&family=JetBrains+Mono:wght@300;400&display=swap');
@@ -283,15 +57,17 @@ const styles = `
   .capsule-card:hover{border-color:rgba(232,168,76,0.22);}
   .capsule-card-row{display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:center;}
   .capsule-to{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--parchment);margin-bottom:0.25rem;}
-  .capsule-subject{font-size:0.85rem;color:var(--dim);font-style:italic;margin-bottom:0.4rem;}
+  .capsule-subject{font-size:0.82rem;color:var(--dim);font-style:italic;margin-bottom:0.25rem;}
+  .capsule-excerpt{font-size:0.78rem;color:rgba(200,184,152,0.45);margin-bottom:0.4rem;line-height:1.5;font-style:italic;}
   .capsule-meta{display:flex;gap:1.25rem;align-items:center;flex-wrap:wrap;}
   .capsule-date{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--dim);}
   .badge{font-family:'JetBrains Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;
     text-transform:uppercase;padding:3px 9px;border-radius:2px;}
   .badge-pending{background:rgba(232,168,76,0.1);color:var(--amber);border:1px solid rgba(232,168,76,0.28);}
   .badge-delivered{background:rgba(100,200,100,0.1);color:#7dc97d;border:1px solid rgba(100,200,100,0.28);}
-  .capsule-delivered{border-color:rgba(125,201,125,0.12);opacity:0.8;}
-  .capsule-delivered:hover{border-color:rgba(125,201,125,0.25);}
+  .badge-today{background:rgba(232,168,76,0.15);color:var(--amber);border:1px solid rgba(232,168,76,0.4);animation:pulse 1.5s ease-in-out infinite;}
+  .capsule-delivered{border-color:rgba(125,201,125,0.12);opacity:0.82;box-shadow:0 0 18px rgba(125,201,125,0.06);}
+  .capsule-delivered:hover{border-color:rgba(125,201,125,0.28);box-shadow:0 0 28px rgba(125,201,125,0.12);}
   .delivered-note{margin-top:0.75rem;padding:0.55rem 0.85rem;background:rgba(125,201,125,0.04);border:1px solid rgba(125,201,125,0.12);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:rgba(125,201,125,0.55);letter-spacing:0.04em;line-height:1.5;}
   .days-left{font-family:'Playfair Display',serif;font-size:1.75rem;color:rgba(232,168,76,0.4);text-align:right;line-height:1;}
   .days-label{font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--dim);text-align:right;letter-spacing:0.1em;text-transform:uppercase;}
@@ -367,21 +143,19 @@ const styles = `
   @media(max-width:860px){.tg{grid-template-columns:repeat(4,1fr);}}
   @media(max-width:640px){.tg{grid-template-columns:repeat(3,1fr);}}
   @media(max-width:400px){.tg{grid-template-columns:repeat(2,1fr);}}
-  .tc{border-radius:6px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.18s;position:relative;}
-  .tc:hover:not(.tc-locked){transform:translateY(-3px);box-shadow:0 8px 22px rgba(0,0,0,0.4);}
-  .tc.sel{border-color:var(--amber);box-shadow:0 0 0 3px rgba(232,168,76,0.2);}
-  .tc-pre{height:54px;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px;}
-  .tc-bar{height:3px;border-radius:2px;}
-  .tc-ln{height:2px;border-radius:1px;opacity:0.32;}
-  .tc-meta{padding:6px 9px 9px;}
-  .tc-sc{font-family:'JetBrains Mono',monospace;font-size:0.49rem;letter-spacing:0.06em;
-    color:rgba(255,255,255,0.35);margin-bottom:2px;}
-  .tc-nm{font-family:'Playfair Display',serif;font-size:0.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .tc-lock{position:absolute;inset:0;background:rgba(8,12,20,0.68);display:flex;flex-direction:column;
-    align-items:center;justify-content:center;gap:4px;backdrop-filter:blur(1px);}
-  .tc-lock-badge{font-family:'JetBrains Mono',monospace;font-size:0.44rem;letter-spacing:0.1em;
-    text-transform:uppercase;color:var(--amber);background:rgba(232,168,76,0.1);
-    border:1px solid rgba(232,168,76,0.28);padding:2px 6px;border-radius:2px;}
+  .tc{border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.22s;position:relative;}
+  .tc:hover:not(.tc-locked){transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,0.5);}
+  .tc.sel{border-color:var(--amber);box-shadow:0 0 0 3px rgba(232,168,76,0.22);}
+  .tc-pre{height:90px;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;position:relative;}
+  .tc-emoji{font-size:1.6rem;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.4));}
+  .tc-bar{height:3px;border-radius:2px;width:55%;}
+  .tc-ln{height:2px;border-radius:1px;opacity:0.25;}
+  .tc-meta{padding:6px 9px 10px;}
+  .tc-sc{font-family:'JetBrains Mono',monospace;font-size:0.46rem;letter-spacing:0.04em;color:rgba(255,255,255,0.32);margin-bottom:2px;}
+  .tc-nm{font-family:'Playfair Display',serif;font-size:0.75rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .tc-lock{position:absolute;inset:0;background:rgba(6,9,16,0.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;backdrop-filter:blur(2px);}
+  .tc-lock-badge{font-family:'JetBrains Mono',monospace;font-size:0.44rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);background:rgba(232,168,76,0.12);border:1px solid rgba(232,168,76,0.3);padding:3px 8px;border-radius:2px;}
+  .tc-lock-price{font-family:'JetBrains Mono',monospace;font-size:0.4rem;color:rgba(232,168,76,0.45);letter-spacing:0.06em;}
 
   /* Chip */
   .sel-chip{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(232,168,76,0.07);
@@ -483,34 +257,10 @@ const styles = `
   }
 `
 
-// ── Step indicator ────────────────────────────────────────────────
-function StepBar({ step }) {
-  const labels = ['Template', 'Edit', 'Review']
-  return (
-    <div className="step-bar">
-      {labels.map((label, i) => {
-        const n = i + 1
-        const state = n < step ? 'done' : n === step ? 'active' : 'todo'
-        return (
-          <div
-            key={label}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              flex: i < labels.length - 1 ? 1 : undefined,
-            }}
-          >
-            <div className="sb-step">
-              <div className={`sb-dot ${state}`}>{state === 'done' ? '✓' : n}</div>
-              <span className={`sb-label ${state}`}>{label}</span>
-            </div>
-            {i < labels.length - 1 && <div className={`sb-line ${step > n ? 'done' : ''}`} />}
-          </div>
-        )
-      })}
-    </div>
-  )
-}
+// ── Message excerpt helper ───────────────────────────────────────────────
+const truncate = (str, n) => (!str ? null : str.length <= n ? str : str.slice(0, n).trimEnd() + '…')
+
+const EDIT_STEP_LABELS = ['Template', 'Edit', 'Review']
 
 // ── 3-step Edit flow ──────────────────────────────────────────────
 function EditFlow({ capsule, onClose, onSaved, showToast }) {
@@ -578,7 +328,7 @@ function EditFlow({ capsule, onClose, onSaved, showToast }) {
 
   return (
     <div className="edit-page">
-      <StepBar step={step} />
+      <StepBar step={step} labels={EDIT_STEP_LABELS} />
 
       {/* ── STEP 1: Change template ── */}
       {step === 1 && (
@@ -598,29 +348,32 @@ function EditFlow({ capsule, onClose, onSaved, showToast }) {
             {TEMPLATES.map(t => {
               const locked = !FREE_IDS.includes(t.id)
               const sel = template === t.id
+              const emoji =
+                t.scenario.match(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|[^\s]+)/u)?.[0] || '✦'
               return (
                 <div
                   key={t.id}
                   className={`tc ${sel ? 'sel' : ''} ${locked ? 'tc-locked' : ''}`}
                   style={{ background: t.card.bg }}
                   onClick={() => !locked && setTemplate(t.id)}
+                  title={locked ? `${t.name} — Premium template` : t.name}
                 >
                   <div className="tc-pre" style={{ background: t.card.bg }}>
-                    <div className="tc-bar" style={{ background: t.card.accent, width: '55%' }} />
+                    <div className="tc-emoji">{emoji}</div>
+                    <div className="tc-bar" style={{ background: t.card.accent }} />
                     <div className="tc-ln" style={{ background: t.card.text, width: '80%' }} />
                     <div className="tc-ln" style={{ background: t.card.text, width: '62%' }} />
-                    <div className="tc-ln" style={{ background: t.card.text, width: '75%' }} />
                   </div>
-                  <div className="tc-meta" style={{ background: `${t.card.bg}ee` }}>
-                    <div className="tc-sc">{t.scenario}</div>
+                  <div className="tc-meta" style={{ background: `${t.card.bg}f0` }}>
                     <div className="tc-nm" style={{ color: t.card.text }}>
                       {t.name}
                     </div>
                   </div>
                   {locked && (
                     <div className="tc-lock">
-                      <span style={{ fontSize: '0.85rem' }}>🔒</span>
+                      <span style={{ fontSize: '1.1rem', opacity: 0.75 }}>🔒</span>
                       <span className="tc-lock-badge">Premium</span>
+                      <span className="tc-lock-price">$5 lifetime</span>
                     </div>
                   )}
                 </div>
@@ -1073,6 +826,9 @@ export default function Dashboard() {
                       <div>
                         <div className="capsule-to">To: {c.to_name}</div>
                         {c.subject && <div className="capsule-subject">"{c.subject}"</div>}
+                        {truncate(c.message, 100) && (
+                          <div className="capsule-excerpt">{truncate(c.message, 100)}</div>
+                        )}
                         <div className="capsule-meta">
                           <span className="capsule-date">
                             {c.delivered
@@ -1080,9 +836,19 @@ export default function Dashboard() {
                               : `Opens ${formatDate(c.deliver_at)}`}
                           </span>
                           <span
-                            className={`badge ${c.delivered ? 'badge-delivered' : 'badge-pending'}`}
+                            className={`badge ${
+                              c.delivered
+                                ? 'badge-delivered'
+                                : daysUntil(c.deliver_at) === 0
+                                  ? 'badge-today'
+                                  : 'badge-pending'
+                            }`}
                           >
-                            {c.delivered ? '✓ Delivered' : '⏳ Sealed'}
+                            {c.delivered
+                              ? '✓ Delivered'
+                              : daysUntil(c.deliver_at) === 0
+                                ? '⏳ Delivering today'
+                                : '⏳ Sealed'}
                           </span>
                         </div>
                       </div>

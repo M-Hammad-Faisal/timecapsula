@@ -86,22 +86,25 @@ const styles = `
   .not-found { text-align: center; }
   .not-found-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
   .not-found-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--parchment-dim); }
+  .share-hint { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em; color: rgba(232,168,76,0.55); background: rgba(232,168,76,0.04); border-bottom: 1px solid rgba(232,168,76,0.1); padding: 0.7rem 1.5rem; text-align: center; line-height: 1.5; }
 `
 
+// Stars — computed once at module level
+const PREVIEW_STARS = Array.from({ length: 80 }, (_, i) => ({
+  id: i,
+  x: Math.random() * 100,
+  y: Math.random() * 100,
+  size: Math.random() * 2 + 0.5,
+  duration: (Math.random() * 3 + 2).toFixed(1),
+  delay: (Math.random() * 5).toFixed(1),
+  minOp: (Math.random() * 0.2 + 0.05).toFixed(2),
+  maxOp: (Math.random() * 0.5 + 0.2).toFixed(2),
+}))
+
 function Stars() {
-  const stars = Array.from({ length: 80 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 2 + 0.5,
-    duration: (Math.random() * 3 + 2).toFixed(1),
-    delay: (Math.random() * 5).toFixed(1),
-    minOp: (Math.random() * 0.2 + 0.05).toFixed(2),
-    maxOp: (Math.random() * 0.5 + 0.2).toFixed(2),
-  }))
   return (
     <div className="stars-bg">
-      {stars.map(s => (
+      {PREVIEW_STARS.map(s => (
         <div
           key={s.id}
           className="star-dot"
@@ -214,6 +217,9 @@ export default function CapsulePreview() {
           </div>
 
           <div className="card-body">
+            <p className="share-hint">
+              ✦ Send this link to your recipient so they can see their capsule is waiting.
+            </p>
             <div className="info-row">
               <span className="info-label">To</span>
               <span className="info-value">{capsule.to_name}</span>

@@ -30,6 +30,7 @@ const styles = `
   .btn-primary:hover { background:var(--gold); }
   .btn-primary:disabled { opacity:0.6; cursor:not-allowed; }
   .login-note { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:rgba(200,184,152,0.35); text-align:center; margin-top:1rem; letter-spacing:0.05em; }
+  .login-error { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#e87878; background:rgba(232,120,120,0.08); border:1px solid rgba(232,120,120,0.25); border-radius:2px; padding:0.6rem 1rem; margin-top:0.75rem; text-align:center; line-height:1.5; }
   .perks { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:2rem; }
   .perk { display:flex; align-items:flex-start; gap:0.5rem; }
   .perk-icon { font-size:0.9rem; flex-shrink:0; margin-top:1px; }
@@ -54,20 +55,22 @@ const styles = `
   }
 `
 
+// Stars — array computed once at module level
+const LOGIN_STARS = Array.from({ length: 60 }, (_, i) => ({
+  id: i,
+  x: Math.random() * 100,
+  y: Math.random() * 100,
+  size: Math.random() * 2 + 0.5,
+  duration: (Math.random() * 3 + 2).toFixed(1),
+  delay: (Math.random() * 5).toFixed(1),
+  minOp: (Math.random() * 0.15 + 0.05).toFixed(2),
+  maxOp: (Math.random() * 0.4 + 0.15).toFixed(2),
+}))
+
 function Stars() {
-  const stars = Array.from({ length: 60 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 2 + 0.5,
-    duration: (Math.random() * 3 + 2).toFixed(1),
-    delay: (Math.random() * 5).toFixed(1),
-    minOp: (Math.random() * 0.15 + 0.05).toFixed(2),
-    maxOp: (Math.random() * 0.4 + 0.15).toFixed(2),
-  }))
   return (
     <div className="stars-bg">
-      {stars.map(s => (
+      {LOGIN_STARS.map(s => (
         <div
           key={s.id}
           className="star-dot"
@@ -92,6 +95,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
+  const [loginError, setLoginError] = useState('')
   const supabase = createClient()
 
   useEffect(() => {
@@ -104,12 +108,17 @@ export default function LoginPage() {
   const sendMagicLink = async () => {
     if (!email.trim()) return
     setSending(true)
+    setLoginError('')
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
       options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     })
     setSending(false)
-    if (!error) setSent(true)
+    if (error) {
+      setLoginError(error.message || 'Something went wrong. Please try again.')
+    } else {
+      setSent(true)
+    }
   }
 
   if (checking)
@@ -193,6 +202,7 @@ export default function LoginPage() {
               >
                 {sending ? '✦ Sending...' : '✦ Send Magic Link'}
               </button>
+              {loginError && <p className="login-error">⚠ {loginError}</p>}
               <p className="login-note">No password. No fuss. Just a link in your inbox.</p>
             </>
           )}

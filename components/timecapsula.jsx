@@ -780,22 +780,23 @@ function GuestEmailPreview({ form }) {
   )
 }
 
+// Stars — array computed once at module level (avoids rerender on state change)
+const STARS = Array.from({ length: 120 }, (_, i) => ({
+  id: i,
+  x: Math.random() * 100,
+  y: Math.random() * 100,
+  size: Math.random() * 2 + 0.5,
+  duration: (Math.random() * 3 + 2).toFixed(1),
+  delay: (Math.random() * 5).toFixed(1),
+  minOp: (Math.random() * 0.2 + 0.05).toFixed(2),
+  maxOp: (Math.random() * 0.6 + 0.3).toFixed(2),
+}))
+
 // Stars component
 function Stars() {
-  const stars = Array.from({ length: 120 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 2 + 0.5,
-    duration: (Math.random() * 3 + 2).toFixed(1),
-    delay: (Math.random() * 5).toFixed(1),
-    minOp: (Math.random() * 0.2 + 0.05).toFixed(2),
-    maxOp: (Math.random() * 0.6 + 0.3).toFixed(2),
-  }))
-
   return (
     <div className="stars-bg">
-      {stars.map(s => (
+      {STARS.map(s => (
         <div
           key={s.id}
           className="star-dot"
@@ -1567,7 +1568,21 @@ export default function TimeCapsula() {
             </div>
             <p className="footer-note">Words sealed with care · Delivered across time</p>
             <p className="footer-note" style={{ color: 'rgba(200,184,152,0.3)' }}>
-              Built with Claude · © {new Date().getFullYear()}
+              <a
+                href="/privacy"
+                style={{ color: 'rgba(200,184,152,0.3)', textDecoration: 'underline' }}
+              >
+                Privacy
+              </a>
+              {' · '}
+              <a
+                href="/terms"
+                style={{ color: 'rgba(200,184,152,0.3)', textDecoration: 'underline' }}
+              >
+                Terms
+              </a>
+              {' · © '}
+              {new Date().getFullYear()}
             </p>
           </footer>
         </>

@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '../lib/supabase/client'
+import { TEMPLATES, FREE_IDS } from '../lib/templates'
+import StepBar from './StepBar'
 
 // ── Constants ─────────────────────────────────────────────────────
 const FREE_LIMIT = 10
-const FREE_IDS = ['cosmic', 'dawn', 'midnight-letter']
 
 const DELIVERY_OPTIONS = [
   { value: '1w', label: '1 week from now' },
@@ -15,281 +16,10 @@ const DELIVERY_OPTIONS = [
   { value: '1y', label: '1 year from now' },
   { value: '2y', label: '2 years from now' },
   { value: '3y', label: '3 years from now' },
-  { value: 'custom-3y', label: 'Pick a date (within 3 years)' },
+  { value: 'custom-3y', label: 'Pick a date' },
 ]
 
-// ── Templates ─────────────────────────────────────────────────────
-const TEMPLATES = [
-  {
-    id: 'cosmic',
-    tier: 'free',
-    scenario: '✦ For anyone',
-    name: 'Cosmic Night',
-    desc: 'Timeless · Dark · Mysterious',
-    placeholder:
-      "Write as if time doesn't exist. No one will read this until the moment you choose...",
-    card: { bg: '#080c14', accent: '#e8a84c', text: '#f2e8d5', dim: '#c8b898' },
-    email: {
-      bg: '#080c14',
-      header: 'linear-gradient(135deg,#0d1525,#111d35)',
-      accent: '#e8a84c',
-      text: '#f2e8d5',
-      dim: '#c8b898',
-      border: 'rgba(232,168,76,0.2)',
-    },
-  },
-  {
-    id: 'dawn',
-    tier: 'free',
-    scenario: '🌅 For hope',
-    name: 'Golden Dawn',
-    desc: 'Hopeful · Warm · Uplifting',
-    placeholder:
-      "By the time you read this, the sun will have risen many times. Here's what I want you to remember...",
-    card: { bg: '#fff8e8', accent: '#c47a1a', text: '#2a1505', dim: '#8a6030' },
-    email: {
-      bg: '#fff8e8',
-      header: 'linear-gradient(135deg,#fff8e8,#fdecc0)',
-      accent: '#c47a1a',
-      text: '#2a1505',
-      dim: '#8a6030',
-      border: 'rgba(196,122,26,0.2)',
-    },
-  },
-  {
-    id: 'midnight-letter',
-    tier: 'free',
-    scenario: '🌙 For yourself',
-    name: 'Midnight Letter',
-    desc: 'Reflective · Cool · Honest',
-    placeholder: "Dear future me, right now I'm sitting here thinking about...",
-    card: { bg: '#0a0f1e', accent: '#8ab4f8', text: '#e8f0ff', dim: '#a0b8d8' },
-    email: {
-      bg: '#0a0f1e',
-      header: 'linear-gradient(135deg,#0f1729,#162040)',
-      accent: '#8ab4f8',
-      text: '#e8f0ff',
-      dim: '#a0b8d8',
-      border: 'rgba(138,180,248,0.2)',
-    },
-  },
-  {
-    id: 'first-birthday',
-    tier: 'premium',
-    scenario: '🎂 For a child',
-    name: 'First Birthday',
-    desc: 'Sweet · Gentle · Parental love',
-    placeholder:
-      "My darling, today you turned one. You have no idea what's happening around you, but I want you to know...",
-    card: { bg: '#fff0f7', accent: '#e8679a', text: '#2a0a18', dim: '#9a4070' },
-    email: {
-      bg: '#fff0f7',
-      header: 'linear-gradient(135deg,#fff0f7,#fdd8ea)',
-      accent: '#e8679a',
-      text: '#2a0a18',
-      dim: '#9a4070',
-      border: 'rgba(232,103,154,0.2)',
-    },
-  },
-  {
-    id: 'graduation',
-    tier: 'premium',
-    scenario: '🎓 For a student',
-    name: 'Graduation Day',
-    desc: 'Proud · Encouraging · Achievement',
-    placeholder:
-      "You did it. Right now, on this day, I am so incredibly proud of everything you've worked for...",
-    card: { bg: '#0f1a0f', accent: '#5cb85c', text: '#e8f5e8', dim: '#7dc97d' },
-    email: {
-      bg: '#0f1a0f',
-      header: 'linear-gradient(135deg,#0f1a0f,#1a2e1a)',
-      accent: '#5cb85c',
-      text: '#e8f5e8',
-      dim: '#7dc97d',
-      border: 'rgba(92,184,92,0.2)',
-    },
-  },
-  {
-    id: 'wedding',
-    tier: 'premium',
-    scenario: '💍 For a partner',
-    name: 'Wedding Vows',
-    desc: 'Romantic · Intimate · Eternal',
-    placeholder:
-      "On our wedding day, here's everything I couldn't fit into my vows. The things I wanted to say but...",
-    card: { bg: '#1a0f0a', accent: '#c8916a', text: '#f5ede8', dim: '#a07060' },
-    email: {
-      bg: '#1a0f0a',
-      header: 'linear-gradient(135deg,#1a0f0a,#2e1a10)',
-      accent: '#c8916a',
-      text: '#f5ede8',
-      dim: '#a07060',
-      border: 'rgba(200,145,106,0.2)',
-    },
-  },
-  {
-    id: 'startup',
-    tier: 'premium',
-    scenario: '🚀 For a founder',
-    name: 'Day One',
-    desc: 'Ambitious · Raw · Entrepreneurial',
-    placeholder:
-      "Today I'm starting something that might fail. But here's why I'm doing it anyway, and what I believe...",
-    card: { bg: '#080c18', accent: '#7c6ef5', text: '#e8e8ff', dim: '#9090cc' },
-    email: {
-      bg: '#080c18',
-      header: 'linear-gradient(135deg,#0c1028,#141830)',
-      accent: '#7c6ef5',
-      text: '#e8e8ff',
-      dim: '#9090cc',
-      border: 'rgba(124,110,245,0.2)',
-    },
-  },
-  {
-    id: 'grief',
-    tier: 'premium',
-    scenario: '🕊️ After a loss',
-    name: 'In Loving Memory',
-    desc: 'Tender · Healing · Comforting',
-    placeholder:
-      "I know this year has been hard. I'm writing this now because I want you to know, even from across time, that...",
-    card: { bg: '#0f0f18', accent: '#a8b4e8', text: '#e8eaf5', dim: '#8898cc' },
-    email: {
-      bg: '#0f0f18',
-      header: 'linear-gradient(135deg,#0f0f20,#18182e)',
-      accent: '#a8b4e8',
-      text: '#e8eaf5',
-      dim: '#8898cc',
-      border: 'rgba(168,180,232,0.2)',
-    },
-  },
-  {
-    id: 'retirement',
-    tier: 'premium',
-    scenario: '🌿 For retirement',
-    name: 'Golden Years',
-    desc: 'Reflective · Grateful · Wise',
-    placeholder:
-      "Today was my last day. Forty years of work, and now it's done. Here's everything I learned and never said...",
-    card: { bg: '#1a1500', accent: '#e8c84c', text: '#f8f0d5', dim: '#c0a870' },
-    email: {
-      bg: '#1a1500',
-      header: 'linear-gradient(135deg,#1a1500,#2a2000)',
-      accent: '#e8c84c',
-      text: '#f8f0d5',
-      dim: '#c0a870',
-      border: 'rgba(232,200,76,0.2)',
-    },
-  },
-  {
-    id: 'new-year',
-    tier: 'premium',
-    scenario: '🎊 New Year',
-    name: 'Dear January',
-    desc: 'Hopeful · Resolute · Fresh start',
-    placeholder:
-      "It's the start of a new year. Here's everything I want to remember about who I am right now...",
-    card: { bg: '#05101e', accent: '#4ad4f5', text: '#e0f8ff', dim: '#80c8e0' },
-    email: {
-      bg: '#05101e',
-      header: 'linear-gradient(135deg,#05101e,#0a1a2e)',
-      accent: '#4ad4f5',
-      text: '#e0f8ff',
-      dim: '#80c8e0',
-      border: 'rgba(74,212,245,0.2)',
-    },
-  },
-  {
-    id: 'apology',
-    tier: 'premium',
-    scenario: '🤝 To make peace',
-    name: 'Unsent Words',
-    desc: 'Vulnerable · Honest · Healing',
-    placeholder:
-      "There's something I've never said to you. By the time you read this, I hope enough time has passed to...",
-    card: { bg: '#180a0a', accent: '#e87878', text: '#fff0f0', dim: '#c08080' },
-    email: {
-      bg: '#180a0a',
-      header: 'linear-gradient(135deg,#180a0a,#280f0f)',
-      accent: '#e87878',
-      text: '#fff0f0',
-      dim: '#c08080',
-      border: 'rgba(232,120,120,0.2)',
-    },
-  },
-  {
-    id: 'milestone',
-    tier: 'premium',
-    scenario: '🏆 For a milestone',
-    name: 'The Summit',
-    desc: 'Triumphant · Proud · Celebratory',
-    placeholder:
-      "Right now I'm standing at the foot of something huge. By the time you read this, I will have...",
-    card: { bg: '#0f0a00', accent: '#ffa040', text: '#fff5e0', dim: '#c08040' },
-    email: {
-      bg: '#0f0a00',
-      header: 'linear-gradient(135deg,#0f0a00,#201500)',
-      accent: '#ffa040',
-      text: '#fff5e0',
-      dim: '#c08040',
-      border: 'rgba(255,160,64,0.2)',
-    },
-  },
-  {
-    id: 'friendship',
-    tier: 'premium',
-    scenario: '👫 For a best friend',
-    name: 'Old Friends',
-    desc: 'Warm · Nostalgic · Playful',
-    placeholder:
-      "Remember when we used to talk every single day? I'm writing this because I want you to know...",
-    card: { bg: '#0a1808', accent: '#88d068', text: '#f0ffe8', dim: '#80b860' },
-    email: {
-      bg: '#0a1808',
-      header: 'linear-gradient(135deg,#0a1808,#152510)',
-      accent: '#88d068',
-      text: '#f0ffe8',
-      dim: '#80b860',
-      border: 'rgba(136,208,104,0.2)',
-    },
-  },
-  {
-    id: 'diagnosis',
-    tier: 'premium',
-    scenario: '💙 Through illness',
-    name: 'Brave Words',
-    desc: 'Courageous · Raw · Deeply human',
-    placeholder:
-      "Today I got news that changed everything. I'm writing this now because I want someone I love to know...",
-    card: { bg: '#08101e', accent: '#60a8e8', text: '#e0f0ff', dim: '#7090c0' },
-    email: {
-      bg: '#08101e',
-      header: 'linear-gradient(135deg,#08101e,#101828)',
-      accent: '#60a8e8',
-      text: '#e0f0ff',
-      dim: '#7090c0',
-      border: 'rgba(96,168,232,0.2)',
-    },
-  },
-  {
-    id: 'parchment',
-    tier: 'premium',
-    scenario: '📜 Classic letter',
-    name: 'Vintage Parchment',
-    desc: 'Aged · Literary · Timeless',
-    placeholder:
-      'I write to you from a world you may barely remember. The clocks ticked differently then...',
-    card: { bg: '#f5e8c8', accent: '#8b4513', text: '#2a1505', dim: '#7a5028' },
-    email: {
-      bg: '#f5e8c8',
-      header: 'linear-gradient(135deg,#f5e8c8,#ead8a8)',
-      accent: '#8b4513',
-      text: '#2a1505',
-      dim: '#7a5028',
-      border: 'rgba(139,69,19,0.2)',
-    },
-  },
-]
+const STEP_LABELS = ['Template', 'Write', 'Confirm']
 
 // ── Helpers ───────────────────────────────────────────────────────
 function computeDelivery(when, customDate) {
@@ -460,85 +190,6 @@ export function EmailPreview({ templateId, form, compact }) {
   )
 }
 
-// ── Step Bar ──────────────────────────────────────────────────────
-const STEP_LABELS = ['Template', 'Write', 'Confirm']
-function StepBar({ step }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', maxWidth: 380, margin: '0 auto 2rem' }}>
-      {STEP_LABELS.map((label, i) => {
-        const n = i + 1
-        const state = n < step ? 'done' : n === step ? 'active' : 'todo'
-        return (
-          <div
-            key={label}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              flex: i < STEP_LABELS.length - 1 ? 1 : undefined,
-            }}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-              <div
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontFamily: 'monospace',
-                  fontSize: '0.65rem',
-                  fontWeight: 700,
-                  flexShrink: 0,
-                  transition: 'all 0.3s',
-                  background:
-                    state === 'active'
-                      ? 'var(--amb)'
-                      : state === 'done'
-                        ? 'rgba(232,168,76,0.15)'
-                        : 'rgba(255,255,255,0.05)',
-                  color:
-                    state === 'active'
-                      ? 'var(--ink)'
-                      : state === 'done'
-                        ? 'var(--amb)'
-                        : 'rgba(200,184,152,0.3)',
-                  border: state === 'done' ? '1px solid rgba(232,168,76,0.4)' : 'none',
-                }}
-              >
-                {state === 'done' ? '✓' : n}
-              </div>
-              <span
-                style={{
-                  fontFamily: 'monospace',
-                  fontSize: '0.58rem',
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  whiteSpace: 'nowrap',
-                  color: state === 'active' ? 'var(--amb)' : 'rgba(200,184,152,0.3)',
-                }}
-              >
-                {label}
-              </span>
-            </div>
-            {i < STEP_LABELS.length - 1 && (
-              <div
-                style={{
-                  flex: 1,
-                  height: 1,
-                  background: step > n ? 'rgba(232,168,76,0.3)' : 'rgba(232,168,76,0.1)',
-                  margin: '0 6px',
-                  marginBottom: 20,
-                }}
-              />
-            )}
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
 // ── Styles ────────────────────────────────────────────────────────
 const S = `
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:wght@400;500&family=JetBrains+Mono:wght@300;400&display=swap');
@@ -568,19 +219,21 @@ nav{padding:1rem 2rem;display:flex;justify-content:space-between;align-items:cen
 @media(max-width:620px){.tgrid{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:400px){.tgrid{grid-template-columns:repeat(2,1fr);}}
 
-.tc{border-radius:6px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.2s;position:relative;}
-.tc:hover:not(.tc-lk){transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.4);}
-.tc.sel{border-color:var(--amb);box-shadow:0 0 0 3px rgba(232,168,76,0.2);}
-.tc-prev{height:58px;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px;}
-.tc-bar{height:3px;border-radius:2px;}
-.tc-line{height:2px;border-radius:1px;opacity:0.32;}
-.tc-meta{padding:7px 9px 9px;}
-.tc-sc{font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:rgba(255,255,255,0.35);margin-bottom:2px;}
-.tc-nm{font-family:'Playfair Display',serif;font-size:0.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.tc-ds{font-family:'JetBrains Mono',monospace;font-size:0.48rem;color:rgba(255,255,255,0.25);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.tc-lock{position:absolute;inset:0;background:rgba(8,12,20,0.72);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;backdrop-filter:blur(1px);}
-.tc-lk-ico{font-size:0.9rem;}
-.tc-lk-badge{font-family:'JetBrains Mono',monospace;font-size:0.46rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--amb);background:rgba(232,168,76,0.1);border:1px solid rgba(232,168,76,0.26);padding:2px 7px;border-radius:2px;}
+.tc{border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.22s;position:relative;}
+.tc:hover:not(.tc-lk){transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,0.5);}
+.tc.sel{border-color:var(--amb);box-shadow:0 0 0 3px rgba(232,168,76,0.22);}
+.tc-prev{height:90px;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;position:relative;}
+.tc-emoji{font-size:1.6rem;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.4));}
+.tc-bar{height:3px;border-radius:2px;width:55%;}
+.tc-line{height:2px;border-radius:1px;opacity:0.25;}
+.tc-meta{padding:7px 9px 10px;}
+.tc-sc{font-family:'JetBrains Mono',monospace;font-size:0.46rem;color:rgba(255,255,255,0.32);margin-bottom:2px;letter-spacing:0.04em;}
+.tc-nm{font-family:'Playfair Display',serif;font-size:0.75rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tc-ds{font-family:'JetBrains Mono',monospace;font-size:0.44rem;color:rgba(255,255,255,0.22);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tc-lock{position:absolute;inset:0;background:rgba(6,9,16,0.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;backdrop-filter:blur(2px);}
+.tc-lk-ico{font-size:1.1rem;opacity:0.75;}
+.tc-lk-badge{font-family:'JetBrains Mono',monospace;font-size:0.44rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--amb);background:rgba(232,168,76,0.12);border:1px solid rgba(232,168,76,0.3);padding:3px 8px;border-radius:2px;}
+.tc-lk-price{font-family:'JetBrains Mono',monospace;font-size:0.4rem;color:rgba(232,168,76,0.45);letter-spacing:0.06em;}
 
 /* ── Step 1 continue btn ── */
 .cont-wrap{text-align:center;}
@@ -903,7 +556,7 @@ export default function WriteCapsule() {
       </nav>
 
       <div className="page">
-        <StepBar step={step} />
+        <StepBar step={step} labels={STEP_LABELS} />
 
         {atLimit && (
           <div className="warn">
@@ -933,21 +586,24 @@ export default function WriteCapsule() {
               {TEMPLATES.map(t => {
                 const locked = !FREE_IDS.includes(t.id)
                 const selected = selectedTemplate === t.id
+                // Extract emoji from scenario string (first char cluster)
+                const emoji =
+                  t.scenario.match(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|[^\s]+)/u)?.[0] || '✦'
                 return (
                   <div
                     key={t.id}
                     className={`tc ${selected ? 'sel' : ''} ${locked ? 'tc-lk' : ''}`}
                     style={{ background: t.card.bg }}
                     onClick={() => (locked ? setLockedModal(t) : setTemplate(t.id))}
+                    title={locked ? `${t.name} — Premium template` : t.name}
                   >
                     <div className="tc-prev" style={{ background: t.card.bg }}>
-                      <div className="tc-bar" style={{ background: t.card.accent, width: '55%' }} />
+                      <div className="tc-emoji">{emoji}</div>
+                      <div className="tc-bar" style={{ background: t.card.accent }} />
                       <div className="tc-line" style={{ background: t.card.text, width: '80%' }} />
-                      <div className="tc-line" style={{ background: t.card.text, width: '60%' }} />
-                      <div className="tc-line" style={{ background: t.card.text, width: '72%' }} />
+                      <div className="tc-line" style={{ background: t.card.text, width: '65%' }} />
                     </div>
-                    <div className="tc-meta" style={{ background: `${t.card.bg}ee` }}>
-                      <div className="tc-sc">{t.scenario}</div>
+                    <div className="tc-meta" style={{ background: `${t.card.bg}f0` }}>
                       <div className="tc-nm" style={{ color: t.card.text }}>
                         {t.name}
                       </div>
@@ -956,7 +612,8 @@ export default function WriteCapsule() {
                     {locked && (
                       <div className="tc-lock">
                         <span className="tc-lk-ico">🔒</span>
-                        <span className="tc-lk-badge">$5 lifetime</span>
+                        <span className="tc-lk-badge">Premium</span>
+                        <span className="tc-lk-price">$5 lifetime</span>
                       </div>
                     )}
                   </div>

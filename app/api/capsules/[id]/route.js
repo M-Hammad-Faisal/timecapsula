@@ -117,12 +117,13 @@ export async function PATCH(request, { params }) {
       )
 
     const body = await request.json()
-    const { subject, message, shareEnabled, template } = body
+    const { subject, message, shareEnabled, template, fromName } = body
 
     const updates = {}
     if (subject !== undefined) updates.subject = subject?.trim() || null
     if (template !== undefined) updates.template = template
     if (shareEnabled !== undefined) updates.share_enabled = shareEnabled
+    if (fromName !== undefined) updates.from_name = fromName?.trim() || null
     if (message !== undefined) {
       if (message.length > 5000)
         return Response.json({ error: 'Message too long' }, { status: 400 })
