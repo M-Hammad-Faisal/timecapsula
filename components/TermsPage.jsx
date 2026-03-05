@@ -4,20 +4,20 @@ import Stars from './Stars'
 
 const styles = `
   .nav { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 2.5rem; background: rgba(8,12,20,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(232,168,76,0.08); }
-  .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--amber); text-decoration: none; }
+  .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; color: var(--amber); text-decoration: none; }
   .nav-logo em { font-style: italic; color: var(--gold); }
-  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; color: var(--dim); text-decoration: none; transition: color 0.2s; }
+  .nav-back { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; color: var(--dim); text-decoration: none; transition: color 0.2s; }
   .nav-back:hover { color: var(--amber); }
 
   .page { max-width: 720px; margin: 0 auto; padding: 4rem 2rem 6rem; position: relative; z-index: 1; }
-  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--amber); margin-bottom: 1rem; }
-  .title { font-family: 'Playfair Display', serif; font-size: 2.8rem; color: var(--parchment); line-height: 1.1; margin-bottom: 0.5rem; }
+  .eyebrow { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--amber); margin-bottom: 1rem; }
+  .title { font-family: 'Cormorant Garamond', serif; font-size: 2.8rem; color: var(--parchment); line-height: 1.1; margin-bottom: 0.5rem; }
   .title em { font-style: italic; color: var(--amber); }
-  .updated { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: rgba(200,184,152,0.4); letter-spacing: 0.08em; margin-bottom: 3rem; }
+  .updated { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: rgba(200,184,152,0.4); letter-spacing: 0.08em; margin-bottom: 3rem; }
 
   .divider { height: 1px; background: linear-gradient(to right, transparent, rgba(232,168,76,0.2), transparent); margin: 2.5rem 0; }
 
-  h2 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--amber); margin-bottom: 0.75rem; margin-top: 2.5rem; }
+  h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--amber); margin-bottom: 0.75rem; margin-top: 2.5rem; }
   p { color: var(--dim); line-height: 1.85; font-size: 0.95rem; margin-bottom: 1rem; }
   ul { color: var(--dim); line-height: 1.85; font-size: 0.95rem; margin-bottom: 1rem; padding-left: 1.5rem; }
   li { margin-bottom: 0.4rem; }
@@ -27,9 +27,9 @@ const styles = `
 
   .footer { text-align: center; padding-top: 4rem; }
   .footer-links { display: flex; gap: 2rem; justify-content: center; margin-bottom: 0.75rem; }
-  .footer-links a { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: rgba(200,184,152,0.35); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
+  .footer-links a { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: rgba(200,184,152,0.35); text-decoration: none; text-transform: uppercase; transition: color 0.2s; }
   .footer-links a:hover { color: var(--amber); }
-  .footer-copy { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: rgba(200,184,152,0.2); letter-spacing: 0.06em; }
+  .footer-copy { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: rgba(200,184,152,0.2); letter-spacing: 0.06em; }
 `
 
 export default function TermsPage() {

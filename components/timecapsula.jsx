@@ -18,7 +18,7 @@ const styles = `
     background: linear-gradient(to bottom, rgba(8,12,20,0.95), transparent);
   }
   .logo {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 1.5rem;
     color: var(--amber);
     letter-spacing: 0.05em;
@@ -31,7 +31,7 @@ const styles = `
     letter-spacing: 0.1em;
     text-transform: uppercase;
     transition: color 0.2s;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
   }
   nav a:hover { color: var(--amber); }
   .nav-links { display: flex; gap: 2rem; align-items: center; }
@@ -58,7 +58,7 @@ const styles = `
   }
 
   .hero-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.75rem;
     letter-spacing: 0.3em;
     text-transform: uppercase;
@@ -69,7 +69,7 @@ const styles = `
   }
 
   .hero-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: clamp(3.5rem, 8vw, 7rem);
     line-height: 1.05;
     font-weight: 700;
@@ -179,7 +179,7 @@ const styles = `
   }
 
   .section-label {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.7rem;
     letter-spacing: 0.3em;
     text-transform: uppercase;
@@ -188,7 +188,7 @@ const styles = `
   }
 
   .section-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: clamp(2rem, 4vw, 3.5rem);
     line-height: 1.15;
     margin-bottom: 4rem;
@@ -224,7 +224,7 @@ const styles = `
   .step-card:hover::before { opacity: 1; }
 
   .step-num {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 4rem;
     font-weight: 700;
     color: rgba(232,168,76,0.1);
@@ -233,7 +233,7 @@ const styles = `
   }
   .step-icon { font-size: 2rem; margin-bottom: 1rem; }
   .step-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 1.3rem;
     color: var(--parchment);
     margin-bottom: 0.75rem;
@@ -257,7 +257,7 @@ const styles = `
   }
   .use-case:hover { border-left-color: var(--amber); background: rgba(232,168,76,0.05); }
   .use-case-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 1.1rem;
     color: var(--amber);
     margin-bottom: 0.5rem;
@@ -290,14 +290,14 @@ const styles = `
     transform: translateX(-50%);
     background: var(--amber);
     color: var(--ink);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
     letter-spacing: 0.15em;
     padding: 3px 12px;
     border-radius: 2px;
   }
   .price-tier {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.7rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -305,7 +305,7 @@ const styles = `
     margin-bottom: 1rem;
   }
   .price-amount {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 3rem;
     font-weight: 700;
     color: var(--parchment);
@@ -340,7 +340,7 @@ const styles = `
   .form-group { margin-bottom: 1.5rem; }
   .form-label {
     display: block;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.7rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -378,7 +378,7 @@ const styles = `
 
   .char-count {
     text-align: right;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.7rem;
     color: var(--parchment-dim);
     margin-top: 0.3rem;
@@ -393,7 +393,7 @@ const styles = `
     text-align: center;
   }
   .delivery-preview p {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-style: italic;
     color: var(--parchment-dim);
     font-size: 0.95rem;
@@ -407,7 +407,7 @@ const styles = `
   }
   .success-icon { font-size: 4rem; margin-bottom: 1.5rem; animation: float 4s ease-in-out infinite; }
   .success-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 2.5rem;
     color: var(--amber);
     margin-bottom: 1rem;
@@ -424,8 +424,8 @@ const styles = `
   }
   .counter-row { display: flex; justify-content: center; gap: 5rem; flex-wrap: wrap; }
   .counter-item { text-align: center; }
-  .counter-num { font-family: 'Playfair Display', serif; font-size: 3.5rem; color: var(--amber); line-height: 1; font-weight: 700; }
-  .counter-label { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--parchment-dim); margin-top: 0.4rem; }
+  .counter-num { font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; color: var(--amber); line-height: 1; font-weight: 700; }
+  .counter-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--parchment-dim); margin-top: 0.4rem; }
 
   /* TESTIMONIALS */
   .testimonials-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
@@ -439,8 +439,8 @@ const styles = `
   .testimonial-text { font-size: 0.95rem; color: var(--parchment-dim); line-height: 1.8; font-style: italic; margin-bottom: 1.5rem; }
   .testimonial-author { display: flex; align-items: center; gap: 0.75rem; }
   .testimonial-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, rgba(232,168,76,0.3), rgba(232,168,76,0.1)); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
-  .testimonial-name { font-family: 'Playfair Display', serif; font-size: 0.9rem; color: var(--parchment); }
-  .testimonial-handle { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: rgba(200,184,152,0.4); }
+  .testimonial-name { font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; color: var(--parchment); }
+  .testimonial-handle { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: rgba(200,184,152,0.4); }
 
   /* FAQ */
   .faq-list { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 0; }
@@ -451,7 +451,7 @@ const styles = `
     font-family: 'Lora', serif; font-size: 1rem; color: var(--parchment); transition: color 0.2s;
   }
   .faq-question:hover { color: var(--amber); }
-  .faq-icon { font-family: 'JetBrains Mono', monospace; color: var(--amber); font-size: 1.2rem; transition: transform 0.3s; flex-shrink: 0; }
+  .faq-icon { font-family: 'DM Mono', monospace; color: var(--amber); font-size: 1.2rem; transition: transform 0.3s; flex-shrink: 0; }
   .faq-icon.open { transform: rotate(45deg); }
   .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.2s; }
   .faq-answer.open { max-height: 300px; padding-bottom: 1.5rem; }
@@ -470,12 +470,12 @@ const styles = `
     gap: 1rem;
   }
   .footer-logo {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 1.2rem;
     color: var(--amber);
   }
   .footer-note {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'DM Mono', monospace;
     font-size: 0.7rem;
     color: var(--parchment-dim);
     letter-spacing: 0.1em;
@@ -585,8 +585,8 @@ const styles = `
 
   /* ── GUEST PREVIEW ── */
   .guest-preview-wrap { margin-top: 2.5rem; }
-  .guest-preview-label { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.65rem; opacity: 0.8; }
-  .guest-preview-note { font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; color: rgba(200,184,152,0.3); text-align: center; margin-top: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  .guest-preview-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.65rem; opacity: 0.8; }
+  .guest-preview-note { font-family: 'DM Mono', monospace; font-size: 0.55rem; color: rgba(200,184,152,0.3); text-align: center; margin-top: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase; }
 
   /* ── PRICING COMING SOON ── */
   .price-card.coming-soon { opacity: 0.7; position: relative; }
@@ -594,7 +594,7 @@ const styles = `
     position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
     background: rgba(232,168,76,0.15); color: var(--amber);
     border: 1px solid rgba(232,168,76,0.4);
-    font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em;
+    font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em;
     padding: 3px 12px; border-radius: 2px; white-space: nowrap;
   }
   .price-features li.locked-feat { opacity: 0.45; }
@@ -1265,7 +1265,7 @@ export default function TimeCapsula() {
                     </select>
                     <p
                       style={{
-                        fontFamily: "'JetBrains Mono', monospace",
+                        fontFamily: "'DM Mono', monospace",
                         fontSize: '0.65rem',
                         color: 'rgba(200,184,152,0.4)',
                         marginTop: '0.4rem',
