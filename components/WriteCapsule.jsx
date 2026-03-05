@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '../lib/supabase/client'
 import { TEMPLATES, FREE_IDS } from '../lib/templates'
 import StepBar from './StepBar'
@@ -21,7 +21,13 @@ const DELIVERY_OPTIONS = [
 
 const STEP_LABELS = ['Template', 'Write', 'Confirm']
 
+const DRAFT_KEY = 'tc_draft'
+
 // ── Helpers ───────────────────────────────────────────────────────
+function validateEmail(v) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
+}
+
 function computeDelivery(when, customDate) {
   if (!when) return null
   if (when.startsWith('custom')) {
@@ -235,7 +241,10 @@ nav{padding:1rem 2rem;display:flex;justify-content:space-between;align-items:cen
 .tc-lk-badge{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--amb);background:rgba(232,168,76,0.12);border:1px solid rgba(232,168,76,0.3);padding:4px 10px;border-radius:2px;}
 .tc-lk-price{font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:rgba(232,168,76,0.5);letter-spacing:0.06em;}
 
-/* ── Step 1 continue btn ── */
+.field-error{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:#e07070;margin-top:4px;}
+.draft-banner{background:rgba(232,168,76,0.07);border:1px solid rgba(232,168,76,0.2);border-radius:4px;padding:0.5rem 0.85rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;font-size:0.78rem;color:var(--amb);}
+.draft-banner button{background:none;border:none;color:rgba(232,168,76,0.5);cursor:pointer;font-size:0.7rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.05em;}
+.draft-banner button:hover{color:var(--amb);}
 .cont-wrap{text-align:center;}
 .cont-btn{display:inline-flex;align-items:center;justify-content:center;gap:0.75rem;background:var(--amb);color:var(--ink);border:none;padding:0.95rem 2.5rem;font-family:'Lora',serif;font-size:1rem;cursor:pointer;border-radius:2px;transition:all 0.2s;}
 .cont-btn:hover{background:var(--gold);}
@@ -363,8 +372,47 @@ export default function WriteCapsule() {
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(null)
   const [toast, setToast] = useState(null)
+  const [emailError, setEmailError] = useState('')
+  const [draftRestored, setDraftRestored] = useState(false)
+  // Waitlist state (inside locked modal)
+  const [waitlistEmail, setWaitlistEmail] = useState('')
+  const [waitlistSent, setWaitlistSent] = useState(false)
+  const [waitlistLoading, setWaitlistLoading] = useState(false)
 
   const supabase = createClient()
+
+  // ── Draft: restore on mount ────────────────────────────────────
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(DRAFT_KEY) || localStorage.getItem(DRAFT_KEY)
+      if (raw) {
+        const d = JSON.parse(raw)
+        if (d.form) setForm(d.form)
+        if (d.template) setTemplate(d.template)
+        if (d.step && d.step > 1) setStep(d.step)
+        setDraftRestored(true)
+      }
+    } catch (_) {
+      /* localStorage unavailable (private mode) */
+    }
+  }, [])
+
+  // ── Draft: save on every change (debounced) ────────────────────
+  const saveDraft = useCallback(() => {
+    if (success) return
+    try {
+      const payload = JSON.stringify({ step, template: selectedTemplate, form })
+      sessionStorage.setItem(DRAFT_KEY, payload)
+      localStorage.setItem(DRAFT_KEY, payload)
+    } catch (_) {
+      /* localStorage unavailable (private mode) */
+    }
+  }, [step, selectedTemplate, form, success])
+
+  useEffect(() => {
+    const t = setTimeout(saveDraft, 400)
+    return () => clearTimeout(t)
+  }, [saveDraft])
 
   useEffect(() => {
     const init = async () => {
@@ -398,6 +446,8 @@ export default function WriteCapsule() {
   const canReview = !!(
     form.to &&
     form.toEmail &&
+    validateEmail(form.toEmail) &&
+    !emailError &&
     form.message &&
     form.when &&
     (!isCustom || form.customDate)
@@ -417,6 +467,11 @@ export default function WriteCapsule() {
         return
       }
       setSuccess({ deliverAt: data.deliverAt, to: form.to })
+      // Clear draft on success
+      try {
+        sessionStorage.removeItem(DRAFT_KEY)
+        localStorage.removeItem(DRAFT_KEY)
+      } catch (_) {}
     } catch (_err) {
       showToast('Network error. Try again.', true)
     } finally {
@@ -524,18 +579,85 @@ export default function WriteCapsule() {
               </div>
             </div>
             <div className="m-btns">
-              <button
-                className="btn-p"
-                onClick={() => {
-                  showToast('Payments coming soon — stay tuned!')
-                  setLockedModal(null)
-                }}
-              >
-                Unlock Template
-              </button>
-              <button className="btn-g" onClick={() => setLockedModal(null)}>
-                Maybe Later
-              </button>
+              {waitlistSent ? (
+                <p
+                  style={{
+                    color: 'var(--amb)',
+                    fontFamily: 'JetBrains Mono,monospace',
+                    fontSize: '0.75rem',
+                    textAlign: 'center',
+                    padding: '0.5rem 0',
+                  }}
+                >
+                  ✓ You're on the list! We'll email you when premium launches.
+                </p>
+              ) : (
+                <>
+                  <p
+                    style={{
+                      fontSize: '0.72rem',
+                      color: 'var(--dim)',
+                      fontFamily: 'JetBrains Mono,monospace',
+                      marginBottom: '0.5rem',
+                      letterSpacing: '0.04em',
+                    }}
+                  >
+                    Get notified when premium templates launch:
+                  </p>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                    <input
+                      type="email"
+                      className="fi"
+                      placeholder="your@email.com"
+                      value={waitlistEmail}
+                      onChange={e => setWaitlistEmail(e.target.value)}
+                      style={{ flex: 1, fontSize: '0.8rem', padding: '0.5rem 0.75rem' }}
+                    />
+                    <button
+                      className="btn-p"
+                      style={{
+                        whiteSpace: 'nowrap',
+                        padding: '0.5rem 1rem',
+                        opacity: waitlistLoading ? 0.6 : 1,
+                      }}
+                      disabled={waitlistLoading}
+                      onClick={async () => {
+                        if (!validateEmail(waitlistEmail)) {
+                          showToast('Please enter a valid email', true)
+                          return
+                        }
+                        setWaitlistLoading(true)
+                        try {
+                          await fetch('/api/waitlist', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              email: waitlistEmail,
+                              template: lockedModal?.id,
+                            }),
+                          })
+                        } catch (_) {
+                          /* network error, still show success */
+                        }
+                        setWaitlistSent(true)
+                        setWaitlistLoading(false)
+                      }}
+                    >
+                      {waitlistLoading ? '...' : 'Notify Me'}
+                    </button>
+                  </div>
+                  <button
+                    className="btn-g"
+                    onClick={() => {
+                      setLockedModal(null)
+                      setWaitlistEmail('')
+                      setWaitlistSent(false)
+                    }}
+                  >
+                    Maybe Later
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -557,6 +679,35 @@ export default function WriteCapsule() {
 
       <div className="page">
         <StepBar step={step} labels={STEP_LABELS} />
+
+        {/* draft restored banner */}
+        {draftRestored && (
+          <div className="draft-banner">
+            <span>✦ Draft restored — continue where you left off</span>
+            <button
+              onClick={() => {
+                setDraftRestored(false)
+                try {
+                  sessionStorage.removeItem(DRAFT_KEY)
+                  localStorage.removeItem(DRAFT_KEY)
+                } catch (_) {}
+                setStep(1)
+                setTemplate('cosmic')
+                setForm({
+                  to: '',
+                  toEmail: '',
+                  from: '',
+                  subject: '',
+                  message: '',
+                  when: '',
+                  customDate: '',
+                })
+              }}
+            >
+              Discard draft ×
+            </button>
+          </div>
+        )}
 
         {atLimit && (
           <div className="warn">
@@ -667,12 +818,20 @@ export default function WriteCapsule() {
                   <div>
                     <label className="fl">Their email *</label>
                     <input
-                      className="fi"
+                      className={`fi${emailError ? ' fi-err' : ''}`}
                       type="email"
                       placeholder="sofia@example.com"
                       value={form.toEmail}
                       onChange={sf('toEmail')}
+                      onBlur={e => {
+                        if (e.target.value && !validateEmail(e.target.value)) {
+                          setEmailError('Please enter a valid email address')
+                        } else {
+                          setEmailError('')
+                        }
+                      }}
                     />
+                    {emailError && <p className="field-error">⚠ {emailError}</p>}
                   </div>
                 </div>
 

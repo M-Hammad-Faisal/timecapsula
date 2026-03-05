@@ -955,9 +955,20 @@ export default function TimeCapsula() {
   const [submitting, setSubmitting] = useState(false)
   const [toast, setToast] = useState(null)
   const [navOpen, setNavOpen] = useState(false)
+  const [statsCount, setStatsCount] = useState(0)
   const writeRef = useRef(null)
 
   useReveal()
+
+  // Fetch real capsule count for the counter banner
+  useEffect(() => {
+    fetch('/api/stats')
+      .then(r => r.json())
+      .then(d => {
+        if (d.capsules > 0) setStatsCount(d.capsules)
+      })
+      .catch(() => {})
+  }, [])
 
   const delivery = getDeliveryText(form.when, form.customDate)
 
@@ -1476,21 +1487,16 @@ export default function TimeCapsula() {
             </div>
           </section>
 
-          {/* COUNTER BANNER */}
-          <div className="counter-banner">
-            <div className="counter-row">
-              {[
-                { num: '12,847', label: 'Capsules Sealed' },
-                { num: '3,201', label: 'Delivered' },
-                { num: '112', label: 'Countries' },
-              ].map(({ num, label }) => (
-                <div className="counter-item" key={label}>
-                  <div className="counter-num">{num}</div>
-                  <div className="counter-label">{label}</div>
+          {statsCount > 0 && (
+            <div className="counter-banner">
+              <div className="counter-row">
+                <div className="counter-item">
+                  <div className="counter-num">{statsCount.toLocaleString()}</div>
+                  <div className="counter-label">Capsules Sealed</div>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* TESTIMONIALS */}
           <section className="section">
