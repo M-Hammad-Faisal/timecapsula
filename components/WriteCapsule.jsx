@@ -252,10 +252,11 @@ nav{padding:1rem 2rem;display:flex;justify-content:space-between;align-items:cen
 .waitlist-input{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(232,168,76,0.2);border-radius:3px;color:var(--parch);font-family:'JetBrains Mono',monospace;font-size:0.85rem;padding:0.65rem 0.85rem;outline:none;transition:border-color 0.2s;}
 .waitlist-input::placeholder{color:rgba(200,184,152,0.3);}
 .waitlist-input:focus{border-color:rgba(232,168,76,0.5);}
-.waitlist-btn{width:100%;background:var(--amb);color:var(--ink);border:none;padding:0.75rem;font-family:'Lora',serif;font-size:0.9rem;font-weight:600;border-radius:3px;cursor:pointer;letter-spacing:0.03em;transition:all 0.2s;margin-top:0.15rem;}
+.waitlist-btn{flex:1;background:var(--amb);color:var(--ink);border:none;padding:0.65rem 0.75rem;font-family:'Lora',serif;font-size:0.9rem;font-weight:600;border-radius:3px;cursor:pointer;letter-spacing:0.03em;transition:all 0.2s;white-space:nowrap;}
 .waitlist-btn:hover:not(:disabled){background:var(--gold);}
 .waitlist-btn:disabled{opacity:0.55;cursor:not-allowed;}
-.waitlist-skip{background:none;border:none;width:100%;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:rgba(200,184,152,0.35);cursor:pointer;padding:0.5rem;letter-spacing:0.06em;transition:color 0.2s;margin-top:0.1rem;}
+.waitlist-actions{display:flex;gap:0.5rem;align-items:center;}
+.waitlist-skip{background:none;border:none;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:rgba(200,184,152,0.4);cursor:pointer;padding:0.5rem 0.25rem;letter-spacing:0.06em;transition:color 0.2s;white-space:nowrap;}
 .waitlist-skip:hover{color:var(--dim);}
 .waitlist-success{display:flex;flex-direction:column;align-items:center;gap:0.5rem;padding:0.75rem 0;border-top:1px solid rgba(232,168,76,0.12);margin-top:0.25rem;}
 .waitlist-check{font-size:1.4rem;color:var(--amb);}
@@ -613,47 +614,50 @@ export default function WriteCapsule() {
                       value={waitlistEmail}
                       onChange={e => setWaitlistEmail(e.target.value)}
                       onKeyDown={async e => {
-                        if (e.key === 'Enter') e.currentTarget.nextElementSibling?.click()
+                        if (e.key === 'Enter')
+                          e.currentTarget.nextElementSibling?.querySelector('button')?.click()
                       }}
                     />
-                    <button
-                      className="waitlist-btn"
-                      disabled={waitlistLoading}
-                      onClick={async () => {
-                        if (!validateEmail(waitlistEmail)) {
-                          showToast('Please enter a valid email', true)
-                          return
-                        }
-                        setWaitlistLoading(true)
-                        try {
-                          await fetch('/api/waitlist', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              email: waitlistEmail,
-                              template: lockedModal?.id,
-                            }),
-                          })
-                        } catch (_) {
-                          /* network error, still show success */
-                        }
-                        setWaitlistSent(true)
-                        setWaitlistLoading(false)
-                      }}
-                    >
-                      {waitlistLoading ? '✦ Sending...' : '✦ Notify Me When It Launches'}
-                    </button>
+                    <div className="waitlist-actions">
+                      <button
+                        className="waitlist-btn"
+                        disabled={waitlistLoading}
+                        onClick={async () => {
+                          if (!validateEmail(waitlistEmail)) {
+                            showToast('Please enter a valid email', true)
+                            return
+                          }
+                          setWaitlistLoading(true)
+                          try {
+                            await fetch('/api/waitlist', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                email: waitlistEmail,
+                                template: lockedModal?.id,
+                              }),
+                            })
+                          } catch (_) {
+                            /* network error, still show success */
+                          }
+                          setWaitlistSent(true)
+                          setWaitlistLoading(false)
+                        }}
+                      >
+                        {waitlistLoading ? '...' : 'Notify Me.'}
+                      </button>
+                      <button
+                        className="waitlist-skip"
+                        onClick={() => {
+                          setLockedModal(null)
+                          setWaitlistEmail('')
+                          setWaitlistSent(false)
+                        }}
+                      >
+                        Maybe Later
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    className="waitlist-skip"
-                    onClick={() => {
-                      setLockedModal(null)
-                      setWaitlistEmail('')
-                      setWaitlistSent(false)
-                    }}
-                  >
-                    Maybe Later
-                  </button>
                 </>
               )}
             </div>
