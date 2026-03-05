@@ -471,7 +471,9 @@ export default function WriteCapsule() {
       try {
         sessionStorage.removeItem(DRAFT_KEY)
         localStorage.removeItem(DRAFT_KEY)
-      } catch (_) {}
+      } catch (_) {
+        // left empty on purpose
+      }
     } catch (_err) {
       showToast('Network error. Try again.', true)
     } finally {
@@ -690,7 +692,9 @@ export default function WriteCapsule() {
                 try {
                   sessionStorage.removeItem(DRAFT_KEY)
                   localStorage.removeItem(DRAFT_KEY)
-                } catch (_) {}
+                } catch (_) {
+                  // left empty on purpose
+                }
                 setStep(1)
                 setTemplate('cosmic')
                 setForm({
