@@ -17,6 +17,7 @@
     "dev": "next dev",
     "next:build": "next build",
     "start": "next start",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -24,7 +25,7 @@
     "build": "npm-run-all lint format:check next:build"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.6.1",
+    "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.98.0",
     "next": "16.1.6",
     "npm-run-all": "^4.1.5",
@@ -32,9 +33,17 @@
     "react-dom": "^19.2.4"
   },
   "devDependencies": {
-    "@eslint/js": "^9.0.0",
-    "eslint": "^9.0.0",
-    "globals": "^15.0.0",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.2",
+    "globals": "^17.4.0",
+    "jest": "^30.2.0",
     "prettier": "^3.8.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/lib/__tests__/**/*.test.js"
+    ],
+    "transform": {}
   }
 }

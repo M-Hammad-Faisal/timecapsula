@@ -3,10 +3,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '../lib/supabase/client'
 import { TEMPLATES, FREE_IDS } from '../lib/templates'
+import { FREE_USER_LIMIT, DRAFT_STORAGE_KEY } from '../lib/constants'
+import { validateEmail } from '../lib/validation'
 import StepBar from './StepBar'
 
 // ── Constants ─────────────────────────────────────────────────────
-const FREE_LIMIT = 10
+const FREE_LIMIT = FREE_USER_LIMIT
 
 const DELIVERY_OPTIONS = [
   { value: '1w', label: '1 week from now' },
@@ -21,13 +23,9 @@ const DELIVERY_OPTIONS = [
 
 const STEP_LABELS = ['Template', 'Write', 'Confirm']
 
-const DRAFT_KEY = 'tc_draft'
+const DRAFT_KEY = DRAFT_STORAGE_KEY
 
 // ── Helpers ───────────────────────────────────────────────────────
-function validateEmail(v) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
-}
-
 function computeDelivery(when, customDate) {
   if (!when) return null
   if (when.startsWith('custom')) {

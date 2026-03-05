@@ -1,13 +1,10 @@
-import { createClient } from '@supabase/supabase-js'
-
-function getServiceClient() {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
-}
+import { getServiceClient } from '../../../lib/supabase/admin'
+import { validateEmail } from '../../../lib/validation'
 
 export async function POST(request) {
   try {
     const { email, template } = await request.json()
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!validateEmail(email)) {
       return Response.json({ error: 'Invalid email' }, { status: 400 })
     }
 

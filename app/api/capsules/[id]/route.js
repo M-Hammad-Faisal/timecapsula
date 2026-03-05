@@ -1,12 +1,6 @@
-import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { createClient as createUserClient } from '../../../../lib/supabase/server'
-
-function getServiceClient() {
-  return createServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  )
-}
+import { getServiceClient } from '../../../../lib/supabase/admin'
+import { MAX_MESSAGE_LENGTH } from '../../../../lib/constants'
 
 // ── GET /api/capsules/[id] ─────────────────────────────────────────
 // - Auth'd owner: returns full capsule including message
@@ -125,7 +119,7 @@ export async function PATCH(request, { params }) {
     if (shareEnabled !== undefined) updates.share_enabled = shareEnabled
     if (fromName !== undefined) updates.from_name = fromName?.trim() || null
     if (message !== undefined) {
-      if (message.length > 5000)
+      if (message.length > MAX_MESSAGE_LENGTH)
         return Response.json({ error: 'Message too long' }, { status: 400 })
       updates.message = message.trim()
     }

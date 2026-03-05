@@ -1,15 +1,8 @@
-import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { createClient as createUserClient } from '../../../lib/supabase/server'
-
-const GUEST_LIMIT = 3
-const FREE_USER_LIMIT = 10
-
-function getServiceClient() {
-  return createServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY
-  )
-}
+import { getServiceClient } from '../../../lib/supabase/admin'
+import { computeDeliveryDate } from '../../../lib/delivery'
+import { validateEmail } from '../../../lib/validation'
+import { GUEST_LIMIT, FREE_USER_LIMIT, MAX_MESSAGE_LENGTH } from '../../../lib/constants'
 
 function getIP(request) {
   return (
@@ -27,12 +20,14 @@ export async function POST(request) {
     if (!to || !toEmail || !message || !when) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 })
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(toEmail)) {
+    if (!validateEmail(toEmail)) {
       return Response.json({ error: 'Invalid email address' }, { status: 400 })
     }
-    if (message.length > 5000) {
-      return Response.json({ error: 'Message too long (max 5000 chars)' }, { status: 400 })
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      return Response.json(
+        { error: `Message too long (max ${MAX_MESSAGE_LENGTH} chars)` },
+        { status: 400 }
+      )
     }
 
     const deliverAt = computeDeliveryDate(when, customDate)
@@ -132,44 +127,4 @@ export async function GET() {
   } catch (_err) {
     return Response.json({ error: 'Failed to fetch capsules' }, { status: 500 })
   }
-}
-
-function computeDeliveryDate(when, customDate) {
-  const now = new Date()
-  const target = new Date(now)
-  if (when === 'custom') {
-    if (!customDate) return null
-    const d = new Date(customDate)
-    return isNaN(d.getTime()) ? null : d
-  }
-  if (when === '1w') {
-    target.setDate(now.getDate() + 7)
-    return target
-  }
-  if (when === '1m') {
-    target.setMonth(now.getMonth() + 1)
-    return target
-  }
-  if (when === '3m') {
-    target.setMonth(now.getMonth() + 3)
-    return target
-  }
-  if (when === '6m') {
-    target.setMonth(now.getMonth() + 6)
-    return target
-  }
-  const yearsMap = {
-    '1y': 1,
-    '2y': 2,
-    '3y': 3,
-    '5y': 5,
-    '10y': 10,
-    '25y': 25,
-    '30y': 30,
-    '50y': 50,
-  }
-  const years = yearsMap[when]
-  if (!years) return null
-  target.setFullYear(now.getFullYear() + years)
-  return target
 }

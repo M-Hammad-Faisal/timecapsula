@@ -44,4 +44,14 @@ export default [
   {
     ignores: ['supabase/functions/**', '.next/**', 'node_modules/**', 'out/**', 'build/**'],
   },
+
+  // ── Test files — add Jest globals ───
+  {
+    files: ['**/__tests__/**/*.{js,jsx}', '**/*.test.{js,jsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.jest,
+      },
+    },
+  },
 ]
