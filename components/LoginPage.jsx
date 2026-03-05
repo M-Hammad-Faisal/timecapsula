@@ -2,17 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '../lib/supabase/client'
+import Stars from './Stars'
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:wght@400;500&family=JetBrains+Mono:wght@300;400&display=swap');
-  * { margin:0; padding:0; box-sizing:border-box; }
-  :root { --midnight:#080c14; --cosmos:#0d1525; --amber:#e8a84c; --gold:#f5c842; --parchment:#f2e8d5; --parchment-dim:#c8b898; --ink:#1a1005; }
-  body { font-family:'Lora',serif; background:var(--midnight); color:var(--parchment); min-height:100vh; }
-  .stars-bg { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
-  .star-dot { position:absolute; border-radius:50%; background:white; animation:twinkle var(--d,3s) ease-in-out infinite; animation-delay:var(--delay,0s); }
-  @keyframes twinkle { 0%,100%{opacity:var(--min-op,0.2)} 50%{opacity:var(--max-op,0.9)} }
   .page { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; position:relative; z-index:1; }
-  .back-link { position:fixed; top:1.5rem; left:2rem; font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; color:var(--parchment-dim); text-decoration:none; display:flex; align-items:center; gap:0.5rem; transition:color 0.2s; z-index:10; }
+  .back-link { position:fixed; top:1.5rem; left:2rem; font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; color:var(--dim); text-decoration:none; display:flex; align-items:center; gap:0.5rem; transition:color 0.2s; z-index:10; }
   .back-link:hover { color:var(--amber); }
   .logo-top { position:fixed; top:1.4rem; right:2rem; font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--amber); text-decoration:none; z-index:10; }
   .logo-top em { font-style:italic; color:var(--gold); }
@@ -21,7 +15,7 @@ const styles = `
   .card-eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.65rem; letter-spacing:0.35em; text-transform:uppercase; color:var(--amber); margin-bottom:1.5rem; text-align:center; }
   .card-title { font-family:'Playfair Display',serif; font-size:2rem; color:var(--parchment); text-align:center; margin-bottom:0.6rem; }
   .card-title em { font-style:italic; color:var(--amber); }
-  .card-desc { color:var(--parchment-dim); font-size:0.9rem; line-height:1.7; text-align:center; font-style:italic; margin-bottom:2rem; }
+  .card-desc { color:var(--dim); font-size:0.9rem; line-height:1.7; text-align:center; font-style:italic; margin-bottom:2rem; }
   .form-label { display:block; font-family:'JetBrains Mono',monospace; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--amber); margin-bottom:0.5rem; }
   .form-input { width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(232,168,76,0.15); border-radius:2px; padding:0.9rem 1rem; color:var(--parchment); font-family:'Lora',serif; font-size:0.95rem; outline:none; transition:border-color 0.2s; margin-bottom:1rem; }
   .form-input:focus { border-color:var(--amber); background:rgba(232,168,76,0.03); }
@@ -34,14 +28,14 @@ const styles = `
   .perks { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:2rem; }
   .perk { display:flex; align-items:flex-start; gap:0.5rem; }
   .perk-icon { font-size:0.9rem; flex-shrink:0; margin-top:1px; }
-  .perk-text { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--parchment-dim); letter-spacing:0.03em; line-height:1.4; }
+  .perk-text { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--dim); letter-spacing:0.03em; line-height:1.4; }
   .magic-sent { text-align:center; }
   .magic-icon { font-size:3rem; margin-bottom:1rem; animation:float 4s ease-in-out infinite; display:block; }
   @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
   .magic-title { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--amber); margin-bottom:0.75rem; }
-  .magic-email { font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--parchment-dim); margin-bottom:0.75rem; }
-  .magic-desc { color:var(--parchment-dim); font-size:0.9rem; line-height:1.7; margin-bottom:1.5rem; }
-  .btn-ghost { background:transparent; color:var(--parchment-dim); border:1px solid rgba(232,168,76,0.2); padding:0.7rem 1.5rem; font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; border-radius:2px; transition:all 0.2s; }
+  .magic-email { font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--dim); margin-bottom:0.75rem; }
+  .magic-desc { color:var(--dim); font-size:0.9rem; line-height:1.7; margin-bottom:1.5rem; }
+  .btn-ghost { background:transparent; color:var(--dim); border:1px solid rgba(232,168,76,0.2); padding:0.7rem 1.5rem; font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; border-radius:2px; transition:all 0.2s; }
   .btn-ghost:hover { border-color:var(--amber); color:var(--amber); }
   .loading-text { font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--amber); letter-spacing:0.2em; animation:pulse 1.5s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
@@ -54,41 +48,6 @@ const styles = `
     .logo-top { top: 1rem; right: 1rem; font-size: 1rem; }
   }
 `
-
-// Stars — array computed once at module level
-const LOGIN_STARS = Array.from({ length: 60 }, (_, i) => ({
-  id: i,
-  x: Math.random() * 100,
-  y: Math.random() * 100,
-  size: Math.random() * 2 + 0.5,
-  duration: (Math.random() * 3 + 2).toFixed(1),
-  delay: (Math.random() * 5).toFixed(1),
-  minOp: (Math.random() * 0.15 + 0.05).toFixed(2),
-  maxOp: (Math.random() * 0.4 + 0.15).toFixed(2),
-}))
-
-function Stars() {
-  return (
-    <div className="stars-bg">
-      {LOGIN_STARS.map(s => (
-        <div
-          key={s.id}
-          className="star-dot"
-          style={{
-            left: `${s.x}%`,
-            top: `${s.y}%`,
-            width: `${s.size}px`,
-            height: `${s.size}px`,
-            '--d': `${s.duration}s`,
-            '--delay': `${s.delay}s`,
-            '--min-op': s.minOp,
-            '--max-op': s.maxOp,
-          }}
-        />
-      ))}
-    </div>
-  )
-}
 
 export default function LoginPage() {
   const [checking, setChecking] = useState(true)

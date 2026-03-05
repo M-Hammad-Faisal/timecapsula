@@ -1,54 +1,10 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-
-const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@300;400&display=swap');`
+import Stars from './Stars'
 
 const styles = `
-  ${FONTS}
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  
-  :root {
-    --midnight: #080c14;
-    --cosmos: #0d1525;
-    --nebula: #111d35;
-    --amber: #e8a84c;
-    --amber-dim: #b07830;
-    --gold: #f5c842;
-    --parchment: #f2e8d5;
-    --parchment-dim: #c8b898;
-    --star: #ffffff;
-    --ink: #1a1005;
-  }
-
   html { scroll-behavior: smooth; }
-
-  body {
-    font-family: 'Lora', Georgia, serif;
-    background: var(--midnight);
-    color: var(--parchment);
-    overflow-x: hidden;
-  }
-
-  /* STARS */
-  .stars-bg {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-  }
-  .star-dot {
-    position: absolute;
-    border-radius: 50%;
-    background: white;
-    animation: twinkle var(--d, 3s) ease-in-out infinite;
-    animation-delay: var(--delay, 0s);
-  }
-  @keyframes twinkle {
-    0%, 100% { opacity: var(--min-op, 0.2); transform: scale(1); }
-    50% { opacity: var(--max-op, 0.9); transform: scale(1.3); }
-  }
 
   /* NAV */
   nav {
@@ -776,42 +732,6 @@ function GuestEmailPreview({ form }) {
           timecapsula.website · words sealed with care
         </p>
       </div>
-    </div>
-  )
-}
-
-// Stars — array computed once at module level (avoids rerender on state change)
-const STARS = Array.from({ length: 120 }, (_, i) => ({
-  id: i,
-  x: Math.random() * 100,
-  y: Math.random() * 100,
-  size: Math.random() * 2 + 0.5,
-  duration: (Math.random() * 3 + 2).toFixed(1),
-  delay: (Math.random() * 5).toFixed(1),
-  minOp: (Math.random() * 0.2 + 0.05).toFixed(2),
-  maxOp: (Math.random() * 0.6 + 0.3).toFixed(2),
-}))
-
-// Stars component
-function Stars() {
-  return (
-    <div className="stars-bg">
-      {STARS.map(s => (
-        <div
-          key={s.id}
-          className="star-dot"
-          style={{
-            left: `${s.x}%`,
-            top: `${s.y}%`,
-            width: `${s.size}px`,
-            height: `${s.size}px`,
-            '--d': `${s.duration}s`,
-            '--delay': `${s.delay}s`,
-            '--min-op': s.minOp,
-            '--max-op': s.maxOp,
-          }}
-        />
-      ))}
     </div>
   )
 }

@@ -1,0 +1,80 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   TimeCapsula — Global Stylesheet
+   Single source of truth for: fonts, design tokens, reset, body, stars.
+   All component-scoped styles stay in their own <style> blocks.
+───────────────────────────────────────────────────────────────────────── */
+
+/* Fonts — loaded once here, never in individual components */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@300;400&display=swap');
+
+/* Reset */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ── Design Tokens ── */
+:root {
+  /* Backgrounds */
+  --midnight: #080c14;
+  --cosmos: #0d1525;
+  --nebula: #111d35;
+
+  /* Accent */
+  --amber: #e8a84c;
+  --amber-dim: #b07830;
+  --gold: #f5c842;
+
+  /* Text */
+  --parchment: #f2e8d5;
+  --dim: #c8b898;
+
+  /* Used in forms/buttons */
+  --ink: #1a1005;
+}
+
+/* ── Base ── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Lora', Georgia, serif;
+  background: var(--midnight);
+  color: var(--parchment);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Stars background ──
+   Used by: timecapsula (home), LoginPage, PrivacyPage, TermsPage.
+   The Stars JSX component lives in components/Stars.jsx.
+── */
+.stars-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.star-dot {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: twinkle var(--d, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: var(--min-op, 0.2);
+  }
+  50% {
+    opacity: var(--max-op, 0.9);
+  }
+}

@@ -1,15 +1,8 @@
 'use client'
 
+import Stars from './Stars'
+
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:wght@400;500&family=JetBrains+Mono:wght@300;400&display=swap');
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root { --midnight: #080c14; --cosmos: #0d1525; --amber: #e8a84c; --gold: #f5c842; --parchment: #f2e8d5; --dim: #c8b898; --ink: #1a1005; }
-  body { font-family: 'Lora', serif; background: var(--midnight); color: var(--parchment); min-height: 100vh; }
-
-  .stars-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-  .star-dot { position: absolute; border-radius: 50%; background: white; animation: twinkle var(--d,3s) ease-in-out infinite; animation-delay: var(--delay,0s); }
-  @keyframes twinkle { 0%,100%{opacity:var(--min-op,0.2)} 50%{opacity:var(--max-op,0.9)} }
-
   .nav { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 2.5rem; background: rgba(8,12,20,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(232,168,76,0.08); }
   .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--amber); text-decoration: none; }
   .nav-logo em { font-style: italic; color: var(--gold); }
@@ -38,40 +31,6 @@ const styles = `
   .footer-links a:hover { color: var(--amber); }
   .footer-copy { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: rgba(200,184,152,0.2); letter-spacing: 0.06em; }
 `
-
-const STARS = Array.from({ length: 60 }, (_, i) => ({
-  id: i,
-  x: Math.random() * 100,
-  y: Math.random() * 100,
-  size: Math.random() * 1.5 + 0.5,
-  duration: (Math.random() * 3 + 2).toFixed(1),
-  delay: (Math.random() * 5).toFixed(1),
-  minOp: (Math.random() * 0.1 + 0.03).toFixed(2),
-  maxOp: (Math.random() * 0.3 + 0.1).toFixed(2),
-}))
-
-function Stars() {
-  return (
-    <div className="stars-bg">
-      {STARS.map(s => (
-        <div
-          key={s.id}
-          className="star-dot"
-          style={{
-            left: `${s.x}%`,
-            top: `${s.y}%`,
-            width: `${s.size}px`,
-            height: `${s.size}px`,
-            '--d': `${s.duration}s`,
-            '--delay': `${s.delay}s`,
-            '--min-op': s.minOp,
-            '--max-op': s.maxOp,
-          }}
-        />
-      ))}
-    </div>
-  )
-}
 
 export default function TermsPage() {
   return (

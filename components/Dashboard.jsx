@@ -9,10 +9,6 @@ import StepBar from './StepBar'
 // ── TEMPLATES and FREE_IDS imported from lib/templates.js ────────────
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:wght@400;500&family=JetBrains+Mono:wght@300;400&display=swap');
-  *{margin:0;padding:0;box-sizing:border-box;}
-  :root{--midnight:#080c14;--cosmos:#0d1525;--nebula:#111d35;--amber:#e8a84c;--gold:#f5c842;--parchment:#f2e8d5;--dim:#c8b898;--ink:#1a1005;}
-  body{font-family:'Lora',serif;background:var(--midnight);color:var(--parchment);min-height:100vh;}
 
   /* NAV */
   nav{padding:1.1rem 2.5rem;display:flex;justify-content:space-between;align-items:center;

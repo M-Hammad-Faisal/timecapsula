@@ -4,18 +4,6 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:wght@400;500&family=JetBrains+Mono:wght@300;400&display=swap');
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root {
-    --midnight: #080c14; --cosmos: #0d1525; --amber: #e8a84c;
-    --gold: #f5c842; --parchment: #f2e8d5; --parchment-dim: #c8b898; --ink: #1a1005;
-  }
-  body { font-family: 'Lora', serif; background: var(--midnight); color: var(--parchment); min-height: 100vh; }
-
-  .stars-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-  .star-dot { position: absolute; border-radius: 50%; background: white; animation: twinkle var(--d,3s) ease-in-out infinite; animation-delay: var(--delay,0s); }
-  @keyframes twinkle { 0%,100%{opacity:var(--min-op,0.2)} 50%{opacity:var(--max-op,0.9)} }
-
   .page { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; position: relative; z-index: 1; }
 
   .capsule-card {
