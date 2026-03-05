@@ -247,7 +247,7 @@ nav{padding:1rem 2rem;display:flex;justify-content:space-between;align-items:cen
 .draft-banner button:hover{color:var(--amb);}
 
 /* ── Waitlist section inside locked modal ── */
-.waitlist-wrap{display:flex;flex-direction:column;gap:0.55rem;border-top:1px solid rgba(232,168,76,0.12);padding-top:1rem;margin-top:0.25rem;}
+.waitlist-wrap{display:flex;flex-direction:column;gap:0.55rem;border-top:1px solid rgba(232,168,76,0.12);padding-top:1rem;margin-top:0.25rem;width:100%;}
 .waitlist-label{font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);}
 .waitlist-input{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(232,168,76,0.2);border-radius:3px;color:var(--parch);font-family:'JetBrains Mono',monospace;font-size:0.85rem;padding:0.65rem 0.85rem;outline:none;transition:border-color 0.2s;}
 .waitlist-input::placeholder{color:rgba(200,184,152,0.3);}
@@ -337,7 +337,7 @@ input[type="date"].fi::-webkit-calendar-picker-indicator{filter:invert(0.7) sepi
 .pr-amt{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--amb);}
 .pr-lbl{font-family:'JetBrains Mono',monospace;font-size:0.55rem;color:var(--dim);letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;}
 .pr-nt{font-family:'JetBrains Mono',monospace;font-size:0.5rem;color:rgba(200,184,152,0.35);margin-top:3px;}
-.m-btns{display:flex;gap:0.6rem;}
+.m-btns{display:flex;flex-direction:column;gap:0.6rem;}
 .btn-p{flex:1;background:var(--amb);color:var(--ink);border:none;padding:0.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;}
 .btn-p:hover{background:var(--gold);}
 .btn-g{background:transparent;color:var(--dim);border:1px solid rgba(232,168,76,0.18);padding:0.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;}
