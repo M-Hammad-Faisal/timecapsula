@@ -986,6 +986,19 @@ export default function TimeCapsula() {
       showToast('Please pick a delivery date ✦')
       return
     }
+    // Save draft to localStorage before submitting so data is never lost
+    try {
+      localStorage.setItem(
+        'tc_draft',
+        JSON.stringify({
+          step: 2,
+          template: 'cosmic',
+          form: { ...form, from: form.from || '', subject: form.subject || '' },
+        })
+      )
+    } catch (_) {
+      /* storage unavailable */
+    }
     setSubmitting(true)
     try {
       const res = await fetch('/api/capsules', {
@@ -995,8 +1008,22 @@ export default function TimeCapsula() {
       })
       const data = await res.json()
       if (!res.ok) {
+        if (data.limitReached) {
+          // Guest limit hit — draft saved, nudge them to sign up
+          showToast('Guest limit reached. Sign up free — your message is saved! ✦')
+          setTimeout(() => {
+            window.location.href = '/login'
+          }, 2200)
+          return
+        }
         showToast(data.error || 'Something went wrong. Try again.')
         return
+      }
+      // Clear draft on success
+      try {
+        localStorage.removeItem('tc_draft')
+      } catch (_) {
+        /* storage unavailable */
       }
       setView('success')
     } catch (_err) {
@@ -1315,10 +1342,25 @@ export default function TimeCapsula() {
                       <option value="1m">1 month from now</option>
                       <option value="3m">3 months from now</option>
                       <option value="6m">6 months from now</option>
-                      <option disabled value="">
-                        ── Sign in for more options ──
-                      </option>
                     </select>
+                    <p
+                      style={{
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: '0.65rem',
+                        color: 'rgba(200,184,152,0.4)',
+                        marginTop: '0.4rem',
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      ✦{' '}
+                      <a
+                        href="/login"
+                        style={{ color: 'rgba(232,168,76,0.5)', textDecoration: 'underline' }}
+                      >
+                        Sign up free
+                      </a>{' '}
+                      to unlock up to 3 years delivery
+                    </p>
                   </div>
                   {form.when === 'custom' && (
                     <div className="form-group">

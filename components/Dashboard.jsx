@@ -66,6 +66,7 @@ const styles = `
   .badge-pending{background:rgba(232,168,76,0.1);color:var(--amber);border:1px solid rgba(232,168,76,0.28);}
   .badge-delivered{background:rgba(100,200,100,0.1);color:#7dc97d;border:1px solid rgba(100,200,100,0.28);}
   .badge-today{background:rgba(232,168,76,0.15);color:var(--amber);border:1px solid rgba(232,168,76,0.4);animation:pulse 1.5s ease-in-out infinite;}
+  .badge-overdue{background:rgba(220,80,80,0.1);color:#e07070;border:1px solid rgba(220,80,80,0.3);animation:pulse 2s ease-in-out infinite;}
   .capsule-delivered{border-color:rgba(125,201,125,0.12);opacity:0.82;box-shadow:0 0 18px rgba(125,201,125,0.06);}
   .capsule-delivered:hover{border-color:rgba(125,201,125,0.28);box-shadow:0 0 28px rgba(125,201,125,0.12);}
   .delivered-note{margin-top:0.75rem;padding:0.55rem 0.85rem;background:rgba(125,201,125,0.04);border:1px solid rgba(125,201,125,0.12);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:rgba(125,201,125,0.55);letter-spacing:0.04em;line-height:1.5;}
@@ -836,19 +837,23 @@ export default function Dashboard() {
                               : `Opens ${formatDate(c.deliver_at)}`}
                           </span>
                           <span
-                            className={`badge ${
-                              c.delivered
-                                ? 'badge-delivered'
-                                : daysUntil(c.deliver_at) === 0
-                                  ? 'badge-today'
-                                  : 'badge-pending'
-                            }`}
+                            className={`badge ${(() => {
+                              if (c.delivered) return 'badge-delivered'
+                              const d = new Date(c.deliver_at)
+                              const isOverdue = d < new Date() && daysUntil(c.deliver_at) === 0
+                              if (isOverdue) return 'badge-overdue'
+                              if (daysUntil(c.deliver_at) === 0) return 'badge-today'
+                              return 'badge-pending'
+                            })()}`}
                           >
-                            {c.delivered
-                              ? '✓ Delivered'
-                              : daysUntil(c.deliver_at) === 0
-                                ? '⏳ Delivering today'
-                                : '⏳ Sealed'}
+                            {(() => {
+                              if (c.delivered) return '✓ Delivered'
+                              const d = new Date(c.deliver_at)
+                              const isOverdue = d < new Date() && daysUntil(c.deliver_at) === 0
+                              if (isOverdue) return '⚠ Delivery pending'
+                              if (daysUntil(c.deliver_at) === 0) return '⏳ Delivering today'
+                              return '⏳ Sealed'
+                            })()}
                           </span>
                         </div>
                       </div>
