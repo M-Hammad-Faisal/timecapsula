@@ -245,6 +245,22 @@ nav{padding:1rem 2rem;display:flex;justify-content:space-between;align-items:cen
 .draft-banner{background:rgba(232,168,76,0.07);border:1px solid rgba(232,168,76,0.2);border-radius:4px;padding:0.5rem 0.85rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;font-size:0.78rem;color:var(--amb);}
 .draft-banner button{background:none;border:none;color:rgba(232,168,76,0.5);cursor:pointer;font-size:0.7rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.05em;}
 .draft-banner button:hover{color:var(--amb);}
+
+/* ── Waitlist section inside locked modal ── */
+.waitlist-wrap{display:flex;flex-direction:column;gap:0.55rem;border-top:1px solid rgba(232,168,76,0.12);padding-top:1rem;margin-top:0.25rem;}
+.waitlist-label{font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);}
+.waitlist-input{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(232,168,76,0.2);border-radius:3px;color:var(--parch);font-family:'JetBrains Mono',monospace;font-size:0.85rem;padding:0.65rem 0.85rem;outline:none;transition:border-color 0.2s;}
+.waitlist-input::placeholder{color:rgba(200,184,152,0.3);}
+.waitlist-input:focus{border-color:rgba(232,168,76,0.5);}
+.waitlist-btn{width:100%;background:var(--amb);color:var(--ink);border:none;padding:0.75rem;font-family:'Lora',serif;font-size:0.9rem;font-weight:600;border-radius:3px;cursor:pointer;letter-spacing:0.03em;transition:all 0.2s;margin-top:0.15rem;}
+.waitlist-btn:hover:not(:disabled){background:var(--gold);}
+.waitlist-btn:disabled{opacity:0.55;cursor:not-allowed;}
+.waitlist-skip{background:none;border:none;width:100%;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:rgba(200,184,152,0.35);cursor:pointer;padding:0.5rem;letter-spacing:0.06em;transition:color 0.2s;margin-top:0.1rem;}
+.waitlist-skip:hover{color:var(--dim);}
+.waitlist-success{display:flex;flex-direction:column;align-items:center;gap:0.5rem;padding:0.75rem 0;border-top:1px solid rgba(232,168,76,0.12);margin-top:0.25rem;}
+.waitlist-check{font-size:1.4rem;color:var(--amb);}
+.waitlist-success p{font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--amb);text-align:center;line-height:1.5;letter-spacing:0.03em;}
+
 .cont-wrap{text-align:center;}
 .cont-btn{display:inline-flex;align-items:center;justify-content:center;gap:0.75rem;background:var(--amb);color:var(--ink);border:none;padding:0.95rem 2.5rem;font-family:'Lora',serif;font-size:1rem;cursor:pointer;border-radius:2px;transition:all 0.2s;}
 .cont-btn:hover{background:var(--gold);}
@@ -582,46 +598,26 @@ export default function WriteCapsule() {
             </div>
             <div className="m-btns">
               {waitlistSent ? (
-                <p
-                  style={{
-                    color: 'var(--amb)',
-                    fontFamily: 'JetBrains Mono,monospace',
-                    fontSize: '0.75rem',
-                    textAlign: 'center',
-                    padding: '0.5rem 0',
-                  }}
-                >
-                  ✓ You're on the list! We'll email you when premium launches.
-                </p>
+                <div className="waitlist-success">
+                  <span className="waitlist-check">✓</span>
+                  <p>You're on the list! We'll email when premium launches.</p>
+                </div>
               ) : (
                 <>
-                  <p
-                    style={{
-                      fontSize: '0.72rem',
-                      color: 'var(--dim)',
-                      fontFamily: 'JetBrains Mono,monospace',
-                      marginBottom: '0.5rem',
-                      letterSpacing: '0.04em',
-                    }}
-                  >
-                    Get notified when premium templates launch:
-                  </p>
-                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                  <div className="waitlist-wrap">
+                    <p className="waitlist-label">Get notified when premium templates launch</p>
                     <input
                       type="email"
-                      className="fi"
+                      className="waitlist-input"
                       placeholder="your@email.com"
                       value={waitlistEmail}
                       onChange={e => setWaitlistEmail(e.target.value)}
-                      style={{ flex: 1, fontSize: '0.8rem', padding: '0.5rem 0.75rem' }}
+                      onKeyDown={async e => {
+                        if (e.key === 'Enter') e.currentTarget.nextElementSibling?.click()
+                      }}
                     />
                     <button
-                      className="btn-p"
-                      style={{
-                        whiteSpace: 'nowrap',
-                        padding: '0.5rem 1rem',
-                        opacity: waitlistLoading ? 0.6 : 1,
-                      }}
+                      className="waitlist-btn"
                       disabled={waitlistLoading}
                       onClick={async () => {
                         if (!validateEmail(waitlistEmail)) {
@@ -645,11 +641,11 @@ export default function WriteCapsule() {
                         setWaitlistLoading(false)
                       }}
                     >
-                      {waitlistLoading ? '...' : 'Notify Me'}
+                      {waitlistLoading ? '✦ Sending...' : '✦ Notify Me When It Launches'}
                     </button>
                   </div>
                   <button
-                    className="btn-g"
+                    className="waitlist-skip"
                     onClick={() => {
                       setLockedModal(null)
                       setWaitlistEmail('')
