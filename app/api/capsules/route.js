@@ -56,7 +56,7 @@ export async function POST(request) {
             error: `Guests can send up to ${GUEST_LIMIT} capsules. Sign in for up to ${FREE_USER_LIMIT}.`,
             limitReached: true,
           },
-          { status: 429 }
+          { status: 429, headers: { 'Retry-After': '60' } }
         )
       }
     } else {
@@ -72,7 +72,7 @@ export async function POST(request) {
             error: `Free plan allows up to ${FREE_USER_LIMIT} capsules.`,
             limitReached: true,
           },
-          { status: 429 }
+          { status: 429, headers: { 'Retry-After': '60' } }
         )
       }
     }

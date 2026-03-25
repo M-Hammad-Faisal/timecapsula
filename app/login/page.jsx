@@ -1,9 +1,6 @@
-'use client'
-
-import dynamic from 'next/dynamic'
-
-const LoginPage = dynamic(() => import('../../components/LoginPage'), { ssr: false })
-
-export default function Login() {
-  return <LoginPage />
+export const metadata = {
+  title: 'Sign In · TimeCapsula',
+  description: 'Sign in to your TimeCapsula vault. No password needed — just a magic link.',
 }
+
+export { default } from '../../components/LoginPage'

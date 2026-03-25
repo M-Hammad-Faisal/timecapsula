@@ -1,9 +1,8 @@
-'use client'
-
-import dynamic from 'next/dynamic'
-
-const WriteCapsule = dynamic(() => import('../../components/WriteCapsule'), { ssr: false })
-
-export default function WritePage() {
-  return <WriteCapsule />
+export const metadata = {
+  title: 'Write a Capsule · TimeCapsula',
+  description:
+    'Compose your time capsule message. Choose a template, write your letter, and seal it for the future.',
+  robots: { index: false },
 }
+
+export { default } from '../../components/WriteCapsule'

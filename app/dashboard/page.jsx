@@ -1,9 +1,7 @@
-'use client'
-
-import dynamic from 'next/dynamic'
-
-const Dashboard = dynamic(() => import('../../components/Dashboard'), { ssr: false })
-
-export default function DashboardPage() {
-  return <Dashboard />
+export const metadata = {
+  title: 'My Capsules · TimeCapsula',
+  description: 'Manage your time capsules — view, edit, and track delivery status.',
+  robots: { index: false },
 }
+
+export { default } from '../../components/Dashboard'

@@ -32,7 +32,7 @@ const stepBarStyles = `
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'DM Mono', monospace;
+    font-family: 'JetBrains Mono', monospace;
     font-size: 0.62rem;
     font-weight: 700;
     transition: all 0.3s;
@@ -54,7 +54,7 @@ const stepBarStyles = `
     border: 1px solid rgba(255,255,255,0.07);
   }
   .stepbar-label {
-    font-family: 'DM Mono', monospace;
+    font-family: 'JetBrains Mono', monospace;
     font-size: 0.54rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;

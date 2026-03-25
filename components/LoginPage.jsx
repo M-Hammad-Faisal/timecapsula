@@ -1,43 +1,44 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '../lib/supabase/client'
 import Stars from './Stars'
 
 const styles = `
   .page { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; position:relative; z-index:1; }
-  .back-link { position:fixed; top:1.5rem; left:2rem; font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; color:var(--dim); text-decoration:none; display:flex; align-items:center; gap:0.5rem; transition:color 0.2s; z-index:10; }
+  .back-link { position:fixed; top:1.5rem; left:2rem; font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; color:var(--dim); text-decoration:none; display:flex; align-items:center; gap:0.5rem; transition:color 0.2s; z-index:10; }
   .back-link:hover { color:var(--amber); }
-  .logo-top { position:fixed; top:1.4rem; right:2rem; font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--amber); text-decoration:none; z-index:10; }
+  .logo-top { position:fixed; top:1.4rem; right:2rem; font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--amber); text-decoration:none; z-index:10; }
   .logo-top em { font-style:italic; color:var(--gold); }
   .login-card { background:var(--cosmos); border:1px solid rgba(232,168,76,0.15); border-radius:6px; padding:3rem 3.5rem; max-width:460px; width:100%; animation:fadeUp 0.6s ease forwards; }
   @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-  .card-eyebrow { font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.35em; text-transform:uppercase; color:var(--amber); margin-bottom:1.5rem; text-align:center; }
-  .card-title { font-family:'Cormorant Garamond',serif; font-size:2rem; color:var(--parchment); text-align:center; margin-bottom:0.6rem; }
+  .card-eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.65rem; letter-spacing:0.35em; text-transform:uppercase; color:var(--amber); margin-bottom:1.5rem; text-align:center; }
+  .card-title { font-family:'Playfair Display',serif; font-size:2rem; color:var(--parchment); text-align:center; margin-bottom:0.6rem; }
   .card-title em { font-style:italic; color:var(--amber); }
   .card-desc { color:var(--dim); font-size:0.9rem; line-height:1.7; text-align:center; font-style:italic; margin-bottom:2rem; }
-  .form-label { display:block; font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--amber); margin-bottom:0.5rem; }
+  .form-label { display:block; font-family:'JetBrains Mono',monospace; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--amber); margin-bottom:0.5rem; }
   .form-input { width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(232,168,76,0.15); border-radius:2px; padding:0.9rem 1rem; color:var(--parchment); font-family:'Lora',serif; font-size:0.95rem; outline:none; transition:border-color 0.2s; margin-bottom:1rem; }
   .form-input:focus { border-color:var(--amber); background:rgba(232,168,76,0.03); }
   .form-input::placeholder { color:rgba(200,184,152,0.35); font-style:italic; }
-  .btn-primary { width:100%; background:var(--amber); color:var(--ink); border:none; padding:0.95rem; font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:0.15em; text-transform:uppercase; cursor:pointer; border-radius:2px; transition:all 0.2s; }
+  .btn-primary { width:100%; background:var(--amber); color:var(--ink); border:none; padding:0.95rem; font-family:'JetBrains Mono',monospace; font-size:0.75rem; letter-spacing:0.15em; text-transform:uppercase; cursor:pointer; border-radius:2px; transition:all 0.2s; }
   .btn-primary:hover { background:var(--gold); }
   .btn-primary:disabled { opacity:0.6; cursor:not-allowed; }
-  .login-note { font-family:'DM Mono',monospace; font-size:0.65rem; color:rgba(200,184,152,0.35); text-align:center; margin-top:1rem; letter-spacing:0.05em; }
-  .login-error { font-family:'DM Mono',monospace; font-size:0.65rem; color:#e87878; background:rgba(232,120,120,0.08); border:1px solid rgba(232,120,120,0.25); border-radius:2px; padding:0.6rem 1rem; margin-top:0.75rem; text-align:center; line-height:1.5; }
+  .login-note { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:rgba(200,184,152,0.35); text-align:center; margin-top:1rem; letter-spacing:0.05em; }
+  .login-error { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#e87878; background:rgba(232,120,120,0.08); border:1px solid rgba(232,120,120,0.25); border-radius:2px; padding:0.6rem 1rem; margin-top:0.75rem; text-align:center; line-height:1.5; }
   .perks { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:2rem; }
   .perk { display:flex; align-items:flex-start; gap:0.5rem; }
   .perk-icon { font-size:0.9rem; flex-shrink:0; margin-top:1px; }
-  .perk-text { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--dim); letter-spacing:0.03em; line-height:1.4; }
+  .perk-text { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--dim); letter-spacing:0.03em; line-height:1.4; }
   .magic-sent { text-align:center; }
   .magic-icon { font-size:3rem; margin-bottom:1rem; animation:float 4s ease-in-out infinite; display:block; }
   @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-  .magic-title { font-family:'Cormorant Garamond',serif; font-size:1.6rem; color:var(--amber); margin-bottom:0.75rem; }
-  .magic-email { font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--dim); margin-bottom:0.75rem; }
+  .magic-title { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--amber); margin-bottom:0.75rem; }
+  .magic-email { font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--dim); margin-bottom:0.75rem; }
   .magic-desc { color:var(--dim); font-size:0.9rem; line-height:1.7; margin-bottom:1.5rem; }
-  .btn-ghost { background:transparent; color:var(--dim); border:1px solid rgba(232,168,76,0.2); padding:0.7rem 1.5rem; font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; border-radius:2px; transition:all 0.2s; }
+  .btn-ghost { background:transparent; color:var(--dim); border:1px solid rgba(232,168,76,0.2); padding:0.7rem 1.5rem; font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; border-radius:2px; transition:all 0.2s; }
   .btn-ghost:hover { border-color:var(--amber); color:var(--amber); }
-  .loading-text { font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--amber); letter-spacing:0.2em; animation:pulse 1.5s ease-in-out infinite; }
+  .loading-text { font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--amber); letter-spacing:0.2em; animation:pulse 1.5s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
 
   @media (max-width: 540px) {
@@ -57,12 +58,14 @@ export default function LoginPage() {
   const [loginError, setLoginError] = useState('')
   const supabase = createClient()
 
+  const router = useRouter()
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) window.location.href = '/dashboard'
+      if (user) router.push('/dashboard')
       else setChecking(false)
     })
-  }, [])
+  }, [router])
 
   const sendMagicLink = async () => {
     if (!email.trim()) return
